@@ -167,8 +167,11 @@ export const AppProvider = ({ children }) => {
   }, [currentUser]);
 
   // login
-  const login = (email, password) => {
-    const user = employees.find(e => e.email.toLowerCase() === email.toLowerCase());
+  const login = (emailOrId, password) => {
+    const identifier = emailOrId.trim().toLowerCase();
+    const user = employees.find(
+      e => e.email.toLowerCase() === identifier || e.id.toLowerCase() === identifier
+    );
     if (!user) throw new Error("Employee not found");
     
     if (user.password && user.password !== password) {
@@ -194,7 +197,7 @@ export const AppProvider = ({ children }) => {
     }
     const year = new Date().getFullYear();
     const serial = String(employees.length + 1).padStart(4, '0');
-    const newId = `ODOO${initials}${year}${serial}`;
+    const newId = `OD${initials}${year}${serial}`;
 
     const newEmployee = {
       id: newId,

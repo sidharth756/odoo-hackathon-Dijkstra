@@ -1,17 +1,22 @@
 import React, { useContext } from 'react';
 import { AppProvider, AppContext } from './context/AppContext';
+import Login from './pages/Login';
+import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import './styles/global.css';
 
 function MainApp() {
   const { currentUser } = useContext(AppContext);
 
+  if (!currentUser) {
+    return <Login />;
+  }
+
   return (
     <div className="app-container">
-      {currentUser && <Navbar />}
+      <Navbar />
       <main className="content">
-        <h1>Welcome to Dayflow HRMS</h1>
-        <p>Your team project skeleton is set up. Pull the changes from GitHub to start implementing your assigned tasks!</p>
+        <Profile />
       </main>
     </div>
   );
