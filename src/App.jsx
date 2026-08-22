@@ -8,27 +8,43 @@ import Attendance from './pages/Attendance';
 import TimeOff from './pages/TimeOff';
 import './styles/global.css';
 
-function MainApp() {
-  const { currentUser, currentTab, notifications } = useContext(AppContext);
+function ToastContainer() {
+  const { notifications } = useContext(AppContext);
+  return (
+    <div className="toast-container">
+      {notifications.map((notif) => (
+        <div key={notif.id} className={`toast toast-${notif.type}`}>
+          <span className="toast-icon">
+            {notif.type === 'success' ? '✅' : notif.type === 'error' ? '❌' : 'ℹ️'}
+          </span>
+          <span className="toast-message">{notif.message}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  // If no user is logged in, show the Auth screen
+function MainApp() {
+  const { currentUser, currentTab } = useContext(AppContext);
+
+  // If no user is logged in, show Auth screen (toasts still rendered via ToastContainer above)
   if (!currentUser) {
-    return <Login />;
+    return (
+      <>
+        <Login />
+        <ToastContainer />
+      </>
+    );
   }
 
-  // State-based Tab Switcher (custom router)
+  // State-based Tab Switcher
   const renderActivePage = () => {
     switch (currentTab) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'profile':
-        return <Profile />;
-      case 'attendance':
-        return <Attendance />;
-      case 'timeoff':
-        return <TimeOff />;
-      default:
-        return <Dashboard />;
+      case 'dashboard':  return <Dashboard />;
+      case 'profile':    return <Profile />;
+      case 'attendance': return <Attendance />;
+      case 'timeoff':    return <TimeOff />;
+      default:           return <Dashboard />;
     }
   };
 
@@ -38,18 +54,7 @@ function MainApp() {
       <main className="content">
         {renderActivePage()}
       </main>
-
-      {/* Floating Toast Notification Container */}
-      <div className="toast-container">
-        {notifications.map((notif) => (
-          <div key={notif.id} className={`toast toast-${notif.type}`}>
-            <span className="toast-icon">
-              {notif.type === 'success' ? '✅' : notif.type === 'error' ? '❌' : 'ℹ️'}
-            </span>
-            <span className="toast-message">{notif.message}</span>
-          </div>
-        ))}
-      </div>
+      <ToastContainer />
     </div>
   );
 }

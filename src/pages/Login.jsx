@@ -25,10 +25,8 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     try {
       if (isSignUp) {
-        // Validation checks
         if (!name.trim() || !email.trim() || !password.trim()) {
           showNotification('Please fill in all required fields.', 'error');
           return;
@@ -41,18 +39,25 @@ export default function Login() {
           showNotification('Password must be at least 6 characters long.', 'error');
           return;
         }
-
         const newUser = signup({ name, email, phone, password, role });
-        showNotification(`Welcome to Dayflow, ${name}! Your Employee ID is ${newUser.id}`, 'success');
+        showNotification(`Welcome to Dayflow, ${newUser.name}! Your ID: ${newUser.id}`, 'success');
       } else {
-        // Sign In
         if (!email.trim() || !password.trim()) {
           showNotification('Please enter both email and password.', 'error');
           return;
         }
         const user = login(email, password);
-        showNotification(`Logged in successfully as ${user.name}!`, 'success');
+        showNotification(`Logged in as ${user.name}!`, 'success');
       }
+    } catch (err) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleDemoLogin = (demoEmail) => {
+    try {
+      const user = login(demoEmail, 'password');
+      showNotification(`Demo login as ${user.name}`, 'success');
     } catch (err) {
       showNotification(err.message, 'error');
     }
@@ -176,15 +181,34 @@ export default function Login() {
               <button 
                 type="button" 
                 className="toggle-mode-btn"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  resetForm();
-                }}
+                onClick={() => { setIsSignUp(!isSignUp); resetForm(); }}
               >
                 {isSignUp ? 'Sign In' : 'Sign Up'}
               </button>
             </p>
           </div>
+
+          {!isSignUp && (
+            <div className="demo-access-section">
+              <div className="demo-divider"><span>Quick Demo Access</span></div>
+              <div className="demo-btn-row">
+                <button 
+                  type="button" 
+                  className="demo-btn demo-admin"
+                  onClick={() => handleDemoLogin('sidharth@odoo.com')}
+                >
+                  👑 Login as HR Admin
+                </button>
+                <button 
+                  type="button" 
+                  className="demo-btn demo-employee"
+                  onClick={() => handleDemoLogin('rujitha@odoo.com')}
+                >
+                  👤 Login as Employee
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
