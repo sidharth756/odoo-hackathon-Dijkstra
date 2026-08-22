@@ -1,112 +1,98 @@
-import React, { useState } from 'react';
-import '../styles/profile.css';
+import React, { useState, useContext } from 'react';
+import { AppContext } from '../context/AppContext';
 
-export default function TabSecurity({ employee, updateProfile }) {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+export default function TabSecurity({ employee, isEditing, onChange }) {
+  const { showNotification } = useContext(AppContext);
+  const [currentPass, setCurrentPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  if (!isEditing) {
+    return (
+      <div className="tab-security-container">
+        <p className="security-notice">
+          ℹ️ Security details can only be edited by the profile owner. Regular view is restricted.
+        </p>
+      </div>
+    );
+  }
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordUpdate = (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
 
-    // Check fields
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setError('All password fields are required.');
+    // Verification check (fallback to '123456' if undefined/null)
+    const currentActualPassword = employee.password || '123456';
+    
+    if (currentPass !== currentActualPassword) {
+      showNotification('Incorrect current password.', 'error');
       return;
     }
 
-    // Verify current password
-    if (employee.password !== currentPassword) {
-      setError('Current password is incorrect.');
+    if (newPass.length < 6) {
+      showNotification('New password must be at least 6 characters long.', 'error');
       return;
     }
 
-    // Verify new password constraints
-    if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters long.');
+    if (newPass !== confirmPass) {
+      showNotification('New passwords do not match.', 'error');
       return;
     }
 
-    // Check confirmation matches
-    if (newPassword !== confirmPassword) {
-      setError('Confirm password does not match your new password.');
-      return;
-    }
-
-    // Update password
-    try {
-      updateProfile(employee.id, { password: newPassword });
-      setSuccess('Password updated successfully!');
-      
-      // Clear fields
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (err) {
-      setError('Failed to update password. Please try again.');
-    }
+    // Save password
+    onChange('password', newPass);
+    showNotification("Password updated successfully! Don't forget to save changes on the header to commit this update.", 'success');
+    
+    // Clear form
+    setCurrentPass('');
+    setNewPass('');
+    setConfirmPass('');
   };
 
   return (
-    <div className="tab-security">
-      <div className="tab-header">
-        <h2>Security Settings</h2>
-      </div>
+    <div className="tab-security-container">
+      <h3 className="section-subtitle">🔒 Change Password</h3>
+      
+      <form onSubmit={handlePasswordUpdate} className="profile-security-form">
+        <div className="form-group-half">
+          <label className="profile-input-label">Current Password *</label>
+          <input
+            type="password"
+            className="profile-input"
+            placeholder="••••••••"
+            value={currentPass}
+            onChange={(e) => setCurrentPass(e.target.value)}
+            required
+          />
+        </div>
 
-      <div className="security-card">
-        <h3>Change Password</h3>
-        <p className="security-subtitle">Provide your current password to update and confirm a new one.</p>
+        <div className="form-group-half">
+          <label className="profile-input-label">New Password *</label>
+          <input
+            type="password"
+            className="profile-input"
+            placeholder="Min 6 characters"
+            value={newPass}
+            onChange={(e) => setNewPass(e.target.value)}
+            required
+          />
+        </div>
 
-        {error && <div className="security-alert error-alert">{error}</div>}
-        {success && <div className="security-alert success-alert">{success}</div>}
+        <div className="form-group-half">
+          <label className="profile-input-label">Confirm New Password *</label>
+          <input
+            type="password"
+            className="profile-input"
+            placeholder="••••••••"
+            value={confirmPass}
+            onChange={(e) => setConfirmPass(e.target.value)}
+            required
+          />
+        </div>
 
-        <form onSubmit={handlePasswordChange} className="security-form">
-          <div className="form-group">
-            <label htmlFor="currentPassword">Current Password</label>
-            <input
-              type="password"
-              id="currentPassword"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter current password"
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="newPassword">New Password</label>
-            <input
-              type="password"
-              id="newPassword"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Min 6 characters"
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm New Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Re-enter new password"
-              className="form-input"
-            />
-          </div>
-
-          <button type="submit" className="btn-security-submit">
-            Update Password
-          </button>
-        </form>
-      </div>
+        <button type="submit" className="profile-btn btn-save" style={{ marginTop: '16px', width: 'fit-content' }}>
+          🔒 Update Password
+        </button>
+      </form>
     </div>
   );
 }

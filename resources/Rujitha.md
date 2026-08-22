@@ -3,7 +3,7 @@ The hackathon started at 10:00 AM and must be completed by 5:30 PM.
 
 ### Project Skeleton is on GitHub
 The Team Lead (Sidharth) has initialized the React + Vite project skeleton and pushed it to GitHub. Before starting work, you MUST run:
-1. `git pull origin master` (to fetch the latest project skeleton)
+1. `git pull origin main` (to fetch the latest project skeleton)
 2. `git checkout -b feature/auth-profile` (to create and switch to your development branch)
 3. `npm install` (to install dependencies)
 

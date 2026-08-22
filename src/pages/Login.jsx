@@ -3,262 +3,215 @@ import { AppContext } from '../context/AppContext';
 import '../styles/login.css';
 
 export default function Login() {
-  const { login, signup } = useContext(AppContext);
+  const { 
+    login, 
+    signup, 
+    showNotification 
+  } = useContext(AppContext);
   const [isSignUp, setIsSignUp] = useState(false);
-  
-  // Form fields
   const [name, setName] = useState('');
-  const [emailOrId, setEmailOrId] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(''); // Stores email on signup, or email/ID on signin
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
-  // Feedback messages
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [role, setRole] = useState('Employee');
 
-  const clearForm = () => {
+  const resetForm = () => {
     setName('');
-    setEmailOrId('');
     setEmail('');
+    setPhone('');
     setPassword('');
     setConfirmPassword('');
-    setError('');
-    setSuccess('');
+    setRole('Employee');
   };
 
-  const handleToggleMode = (mode) => {
-    setIsSignUp(mode);
-    clearForm();
-  };
-
-  const validateEmail = (mail) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(mail);
-  };
-
-  const handleSignIn = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    const identifier = emailOrId.trim();
-    const pwd = password.trim();
-
-    if (!identifier) {
-      setError('Employee ID or Email is required.');
-      return;
-    }
-
-    if (!pwd) {
-      setError('Password is required.');
-      return;
-    }
-
     try {
-      login(identifier, pwd);
-      setSuccess('Successfully signed in!');
+      if (isSignUp) {
+        if (!name.trim() || !email.trim()) {
+          showNotification('Please fill in all required fields.', 'error');
+          return;
+        }
+        if (password !== confirmPassword) {
+          showNotification('Passwords do not match.', 'error');
+          return;
+        }
+        if (password.length < 6) {
+          showNotification('Password must be at least 6 characters long.', 'error');
+          return;
+        }
+        const newUser = signup({ name, email, phone, password, role });
+        showNotification(`Welcome to Dayflow, ${newUser.name}! Your ID: ${newUser.id}`, 'success');
+      } else {
+        if (!email.trim() || !password.trim()) {
+          showNotification('Please enter both Employee ID/email and password.', 'error');
+          return;
+        }
+        const user = login(email, password);
+        showNotification(`Logged in as ${user.name}!`, 'success');
+      }
     } catch (err) {
-      setError(err.message || 'Failed to sign in. Please try again.');
+      showNotification(err.message, 'error');
     }
   };
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    const trimmedName = name.trim();
-    const trimmedEmail = email.trim();
-    const pwd = password;
-    const confirmPwd = confirmPassword;
-
-    if (!trimmedName) {
-      setError('Full Name is required.');
-      return;
-    }
-
-    if (!trimmedEmail) {
-      setError('Email address is required.');
-      return;
-    }
-
-    if (!validateEmail(trimmedEmail)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-
-    if (!pwd) {
-      setError('Password is required.');
-      return;
-    }
-
-    if (pwd.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
-
-    if (pwd !== confirmPwd) {
-      setError('Passwords do not match.');
-      return;
-    }
-
+  const handleDemoLogin = (demoEmail) => {
     try {
-      const newUser = signup({
-        name: trimmedName,
-        email: trimmedEmail,
-        password: pwd,
-        role: 'Employee' // Default role for self sign-up
-      });
-      setSuccess(`Account created successfully! Your Employee ID is ${newUser.id}`);
+      const user = login(demoEmail, 'password');
+      showNotification(`Demo login as ${user.name}`, 'success');
     } catch (err) {
-      setError(err.message || 'Failed to sign up. Please try again.');
+      showNotification(err.message, 'error');
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-background-decor">
-        <div className="decor-circle decor-1"></div>
-        <div className="decor-circle decor-2"></div>
+    <div className="login-screen-container">
+      <div className="login-visual-sidebar">
+        <div className="visual-logo-container">
+          <div className="visual-logo">D</div>
+          <h1>Dayflow</h1>
+        </div>
+        <p className="visual-subtitle">Every workday, perfectly aligned.</p>
+        <div className="visual-graphics">
+          <div className="graphic-circle graphic-1" />
+          <div className="graphic-circle graphic-2" />
+        </div>
       </div>
 
-      <div className="login-card">
-        <div className="login-logo-container">
-          <span className="logo-icon">⚡</span>
-          <span className="logo-text">day<span>flow</span></span>
-        </div>
+      <div className="login-form-sidebar">
+        <div className="login-card glassmorphism">
+          <div className="form-header">
+            <h2>{isSignUp ? 'Create an Account' : 'Sign In'}</h2>
+            <p className="form-subtitle">
+              {isSignUp 
+                ? 'Join Dayflow to manage your profiles and attendance.' 
+                : 'Welcome back! Please enter your details to access your dashboard.'
+              }
+            </p>
+          </div>
 
-        <div className="login-tabs">
-          <button 
-            type="button" 
-            className={`login-tab-btn ${!isSignUp ? 'active' : ''}`}
-            onClick={() => handleToggleMode(false)}
-          >
-            Sign In
-          </button>
-          <button 
-            type="button" 
-            className={`login-tab-btn ${isSignUp ? 'active' : ''}`}
-            onClick={() => handleToggleMode(true)}
-          >
-            Sign Up
-          </button>
-        </div>
-
-        <div className="login-card-body">
-          <h2 className="login-title">
-            {isSignUp ? 'Create your Account' : 'Welcome Back'}
-          </h2>
-          <p className="login-subtitle">
-            {isSignUp ? 'Get started with Dayflow HRMS' : 'Sign in to access your dashboard'}
-          </p>
-
-          {error && <div className="login-alert error-alert">{error}</div>}
-          {success && <div className="login-alert success-alert">{success}</div>}
-
-          {!isSignUp ? (
-            <form onSubmit={handleSignIn} className="login-form">
+          <form onSubmit={handleSubmit} className="auth-form">
+            {isSignUp && (
               <div className="form-group">
-                <label htmlFor="emailOrId">Employee ID or Email</label>
-                <div className="input-wrapper">
-                  <span className="input-icon">👤</span>
-                  <input
-                    type="text"
-                    id="emailOrId"
-                    value={emailOrId}
-                    onChange={(e) => setEmailOrId(e.target.value)}
-                    placeholder="e.g. ODOO20260001 or employee@odoo.com"
-                    className="form-input"
-                  />
-                </div>
+                <label htmlFor="auth-name">Full Name *</label>
+                <input
+                  id="auth-name"
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
               </div>
+            )}
 
+            <div className="form-group">
+              <label htmlFor="auth-email">
+                {isSignUp ? 'Email Address *' : 'Employee ID or Email Address *'}
+              </label>
+              <input
+                id="auth-email"
+                type={isSignUp ? 'email' : 'text'}
+                placeholder={isSignUp ? 'john.doe@company.com' : 'e.g. ODOO20260001 or email@company.com'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            {isSignUp && (
               <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <div className="input-wrapper">
-                  <span className="input-icon">🔒</span>
+                <label htmlFor="auth-phone">Phone Number</label>
+                <input
+                  id="auth-phone"
+                  type="tel"
+                  placeholder="+91 98765 43210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+            )}
+
+            <div className="form-group">
+              <label htmlFor="auth-password">Password *</label>
+              <input
+                id="auth-password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {isSignUp && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="auth-confirm">Confirm Password *</label>
                   <input
+                    id="auth-confirm"
                     type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <button type="submit" className="login-submit-btn">
-                Sign In
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleSignUp} className="login-form">
-              <div className="form-group">
-                <label htmlFor="fullName">Full Name</label>
-                <div className="input-wrapper">
-                  <span className="input-icon">👤</span>
-                  <input
-                    type="text"
-                    id="fullName"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Rujitha Employee"
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
-                <div className="input-wrapper">
-                  <span className="input-icon">✉️</span>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="e.g. employee@odoo.com"
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password">Password</label>
-                <div className="input-wrapper">
-                  <span className="input-icon">🔒</span>
-                  <input
-                    type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 6 characters"
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="input-wrapper">
-                  <span className="input-icon">🔑</span>
-                  <input
-                    type="password"
-                    id="confirmPassword"
+                    placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repeat password"
-                    className="form-input"
+                    required
                   />
                 </div>
-              </div>
 
-              <button type="submit" className="login-submit-btn">
-                Sign Up
+                <div className="form-group">
+                  <label htmlFor="auth-role">Designated Role *</label>
+                  <select
+                    id="auth-role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    required
+                  >
+                    <option value="Employee">Regular Employee</option>
+                    <option value="HR">HR Officer / Admin</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            <button type="submit" className="submit-auth-btn">
+              {isSignUp ? 'Sign Up' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="form-toggle-footer">
+            <p>
+              {isSignUp ? 'Already have an account?' : 'Need to register your profile?'}
+              <button 
+                type="button" 
+                className="toggle-mode-btn"
+                onClick={() => { setIsSignUp(!isSignUp); resetForm(); }}
+              >
+                {isSignUp ? 'Sign In' : 'Sign Up'}
               </button>
-            </form>
+            </p>
+          </div>
+
+          {!isSignUp && (
+            <div className="demo-access-section">
+              <div className="demo-divider"><span>Quick Demo Access</span></div>
+              <div className="demo-btn-row">
+                <button 
+                  type="button" 
+                  className="demo-btn demo-admin"
+                  onClick={() => handleDemoLogin('sidharth@odoo.com')}
+                >
+                  👑 Login as HR Admin
+                </button>
+                <button 
+                  type="button" 
+                  className="demo-btn demo-employee"
+                  onClick={() => handleDemoLogin('rujitha@odoo.com')}
+                >
+                  👤 Login as Employee
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

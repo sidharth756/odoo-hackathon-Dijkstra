@@ -1,1 +1,257 @@
-/* Styles for Attendance Page */
+/* Attendance View Styles */
+
+.attendance-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.attendance-header-card {
+  padding: 24px 32px;
+}
+
+.attendance-title-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.attendance-title-area h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.attendance-title-area .subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.page-icon {
+  font-size: 32px;
+}
+
+/* Filters Card */
+.attendance-filters-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 32px;
+}
+
+.filters-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-grow {
+  flex: 1;
+  min-width: 260px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.filter-input-date,
+.filter-input-search {
+  height: 42px;
+  font-size: 14px;
+}
+
+.filter-input-search {
+  width: 100%;
+}
+
+/* Attendance Statistics Badges */
+.stats-row {
+  display: flex;
+  gap: 16px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: 12px 20px;
+  min-width: 140px;
+}
+
+.stat-badge-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.stat-badge-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary-color);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Table layout styling */
+.attendance-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.attendance-table th {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  padding: 16px 24px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-color);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.attendance-table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  color: var(--text-main);
+}
+
+.attendance-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.attendance-table tbody tr:hover td {
+  background-color: #fafbfd;
+}
+
+.log-employee-name {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.log-employee-email {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.time-cell,
+.hours-cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.hours-cell {
+  color: var(--primary-color);
+}
+
+/* Custom pills inside cells */
+.status-pill {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.status-present {
+  background-color: #ecfdf5;
+  color: var(--color-present);
+}
+
+/* Empty Logs placeholder state */
+.empty-table-state {
+  text-align: center;
+  padding: 80px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.65;
+}
+
+.empty-table-state h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.empty-table-state p {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 380px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .attendance-header-card {
+    padding: 20px 24px;
+  }
+  
+  .attendance-title-area h1 {
+    font-size: 20px;
+  }
+  
+  .attendance-filters-card {
+    padding: 20px 24px;
+  }
+
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .stats-row {
+    flex-direction: column;
+  }
+
+  .stat-badge {
+    width: 100%;
+  }
+
+  .attendance-table th,
+  .attendance-table td {
+    padding: 12px 16px;
+  }
+}
