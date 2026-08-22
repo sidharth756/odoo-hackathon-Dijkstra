@@ -1,1 +1,26 @@
 /* Styles for Attendance Page */
+.attendance-page {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.data-table th {
+  border-bottom: 2px solid var(--border-color);
+  padding: 14px 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.data-table td {
+  padding: 12px 10px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.015);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
