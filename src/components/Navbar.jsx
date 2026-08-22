@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '../context/AppContext';
+import { UsersIcon, CalendarIcon, PalmIcon, LogOutIcon } from './Icons';
 
 export default function Navbar() {
   const { currentUser, currentTab, setCurrentTab, logout } = useContext(AppContext);
@@ -45,19 +46,22 @@ export default function Navbar() {
             className={`nav-item ${currentTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => setCurrentTab('dashboard')}
           >
-            Employees
+            <UsersIcon size={16} className="nav-icon" />
+            <span>Employees</span>
           </button>
           <button
             className={`nav-item ${currentTab === 'attendance' ? 'active' : ''}`}
             onClick={() => setCurrentTab('attendance')}
           >
-            Attendance
+            <CalendarIcon size={16} className="nav-icon" />
+            <span>Attendance</span>
           </button>
           <button
             className={`nav-item ${currentTab === 'timeoff' ? 'active' : ''}`}
             onClick={() => setCurrentTab('timeoff')}
           >
-            Time Off
+            <PalmIcon size={16} className="nav-icon" />
+            <span>Time Off</span>
           </button>
         </nav>
 
@@ -93,7 +97,8 @@ export default function Navbar() {
                   setDropdownOpen(false);
                 }}
               >
-                My Profile
+                <UsersIcon size={14} className="dropdown-icon" />
+                <span>My Profile</span>
               </button>
               <button
                 className="dropdown-item text-danger"
@@ -102,7 +107,8 @@ export default function Navbar() {
                   setDropdownOpen(false);
                 }}
               >
-                Log Out
+                <LogOutIcon size={14} className="dropdown-icon" />
+                <span>Log Out</span>
               </button>
             </div>
           )}

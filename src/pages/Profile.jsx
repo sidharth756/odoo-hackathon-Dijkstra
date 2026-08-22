@@ -4,7 +4,11 @@ import TabResume from '../components/TabResume';
 import TabPrivateInfo from '../components/TabPrivateInfo';
 import TabSalaryInfo from '../components/TabSalaryInfo';
 import TabSecurity from '../components/TabSecurity';
+<<<<<<< HEAD
 import { PencilIcon, SaveIcon, CloseIcon, LogoutIcon, BackIcon, CameraIcon } from '../components/Icons';
+=======
+import { EditIcon, CheckIcon, XIcon, ChevronDownIcon, UploadIcon } from '../components/Icons';
+>>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
 import '../styles/profile.css';
 
 export default function Profile() {
@@ -221,9 +225,31 @@ export default function Profile() {
             )}
             
             {canEdit && (
+<<<<<<< HEAD
               <div className="avatar-upload-overlay">
                 <span><CameraIcon size={14} style={{ marginRight: '4px' }} /> Upload</span>
               </div>
+=======
+              <label className="avatar-upload-label" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <UploadIcon size={12} />
+                <span>Upload</span>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        handleFieldChange(null, 'avatar', reader.result);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </label>
+>>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             )}
             <input 
               type="file" 
@@ -249,15 +275,29 @@ export default function Profile() {
               className="profile-btn btn-edit" 
               onClick={() => setIsEditing(true)}
             >
+<<<<<<< HEAD
               <PencilIcon size={14} style={{ marginRight: '6px' }} /> Edit Profile
+=======
+              <EditIcon size={14} />
+              <span>Edit Profile</span>
+>>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             </button>
           ) : canUserEditProfile && isEditing ? (
             <div className="action-button-group">
               <button className="profile-btn btn-save" onClick={handleSave}>
+<<<<<<< HEAD
                 <SaveIcon size={14} style={{ marginRight: '6px' }} /> Save
               </button>
               <button className="profile-btn btn-cancel" onClick={handleCancel}>
                 <CloseIcon size={14} style={{ marginRight: '6px' }} /> Cancel
+=======
+                <CheckIcon size={14} />
+                <span>Save</span>
+              </button>
+              <button className="profile-btn btn-cancel" onClick={handleCancel}>
+                <XIcon size={14} />
+                <span>Cancel</span>
+>>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
               </button>
             </div>
           ) : null}
@@ -267,6 +307,7 @@ export default function Profile() {
               className="profile-btn btn-back"
               onClick={() => setCurrentTab('dashboard')}
             >
+<<<<<<< HEAD
               <BackIcon size={14} style={{ marginRight: '6px' }} /> Back to List
             </button>
           )}
@@ -274,6 +315,10 @@ export default function Profile() {
           {isOwnProfile && (
             <button className="profile-btn btn-logout" onClick={logout}>
               <LogoutIcon size={14} style={{ marginRight: '6px' }} /> Sign Out
+=======
+              <ChevronDownIcon size={14} style={{ transform: 'rotate(90deg)' }} />
+              <span>Back to List</span>
+>>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             </button>
           )}
         </div>

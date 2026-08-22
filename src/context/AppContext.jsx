@@ -448,6 +448,8 @@ export const AppProvider = ({ children }) => {
       currentUser,
       currentTab,
       setCurrentTab,
+      activeTab: currentTab,
+      setActiveTab: setCurrentTab,
       viewedEmployeeId,
       setViewedEmployeeId,
       notifications,
