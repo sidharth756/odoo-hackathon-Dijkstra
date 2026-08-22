@@ -1,1 +1,334 @@
-/* Styles for Profile page and modular tabs */
+/* Profile Detail View Layout Styles */
+
+.profile-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Profile Hero top card */
+.profile-hero-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 40px;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.profile-header-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* Avatar container with upload controls */
+.profile-avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.profile-hero-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-hero-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 800;
+  font-size: 36px;
+  border: 3px solid var(--primary-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.avatar-upload-label {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.avatar-upload-label:hover {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+.profile-title-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-hero-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.profile-hero-id {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.profile-hero-role {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-color);
+  background-color: var(--primary-light);
+  padding: 3px 10px;
+  border-radius: 12px;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+/* Header Buttons and Action Groups */
+.profile-action-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.action-button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.profile-btn {
+  padding: 10px 18px;
+  border-radius: var(--border-radius-sm);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-btn:active {
+  transform: translateY(0);
+}
+
+.btn-edit {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn-edit:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-save {
+  background-color: var(--secondary-color);
+  color: #ffffff;
+}
+
+.btn-save:hover {
+  background-color: var(--secondary-hover);
+}
+
+.btn-cancel,
+.btn-back {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.btn-cancel:hover,
+.btn-back:hover {
+  background-color: #f3f4f6;
+}
+
+/* Tabs Navigation in Details Panel */
+.profile-content-section {
+  padding: 32px;
+  min-height: 480px;
+}
+
+.profile-tabs-header {
+  display: flex;
+  gap: 16px;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.profile-tab-item {
+  padding: 12px 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+}
+
+.profile-tab-item:hover {
+  color: var(--primary-color);
+}
+
+.profile-tab-item.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+/* Tab Panel and Form Layouts */
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group-half {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group-full {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile-input-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.profile-input,
+.profile-select {
+  width: 100%;
+}
+
+.profile-textarea {
+  width: 100%;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Display Views (View-Only Mode) */
+.profile-text-display {
+  padding: 11px 14px;
+  background-color: var(--bg-color);
+  border-radius: var(--border-radius-sm);
+  border: 1px dashed var(--border-color);
+  font-size: 14px;
+  color: var(--text-main);
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+}
+
+.profile-text-display.font-bold {
+  font-weight: 700;
+}
+
+.profile-text-display.font-semibold {
+  font-weight: 600;
+}
+
+.profile-text-display.bg-light-gray {
+  background-color: #f3f4f6;
+  border-style: solid;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 16px 0 12px 0;
+  letter-spacing: -0.1px;
+}
+
+.profile-section-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 28px 0;
+}
+
+/* Security notice block */
+.security-notice {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  background-color: var(--primary-light);
+  padding: 16px 20px;
+  border-radius: var(--border-radius-md);
+  border-left: 4px solid var(--primary-color);
+  line-height: 1.5;
+}
+
+.profile-security-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 480px;
+  margin-top: 16px;
+}
+
+/* Responsive Grid styling */
+@media (max-width: 768px) {
+  .profile-hero-card {
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-header-main {
+    gap: 16px;
+  }
+
+  .profile-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-action-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-button-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .profile-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group-full {
+    grid-column: span 1;
+  }
+}
