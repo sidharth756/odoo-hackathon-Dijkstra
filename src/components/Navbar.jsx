@@ -21,13 +21,13 @@ export default function Navbar() {
 
   if (!currentUser) return null;
 
-  // Render user initials if no avatar is provided
+  // Render user initials — strip non-alpha chars (handles "Sidharth (Admin)")
   const getInitials = () => {
-    const nameParts = currentUser.name.split(' ');
-    if (nameParts.length >= 2) {
-      return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
-    }
-    return currentUser.name.substring(0, 2).toUpperCase();
+    const cleanName = currentUser.name.replace(/[^a-zA-Z ]/g, '').trim();
+    const parts = cleanName.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return 'ME';
   };
 
   return (

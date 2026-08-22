@@ -20,13 +20,13 @@ export default function EmployeeCard({ employee }) {
     }
   };
 
-  // Get initials for profile picture placeholder
+  // Get initials — strip non-alpha chars (handles names like "Sidharth (Admin)")
   const getInitials = () => {
-    const nameParts = employee.name.split(' ');
-    if (nameParts.length >= 2) {
-      return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
-    }
-    return employee.name.substring(0, 2).toUpperCase();
+    const cleanName = employee.name.replace(/[^a-zA-Z ]/g, '').trim();
+    const parts = cleanName.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return 'EM';
   };
 
   const handleCardClick = () => {
