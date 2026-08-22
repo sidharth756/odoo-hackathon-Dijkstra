@@ -255,3 +255,80 @@
     padding: 12px 16px;
   }
 }
+
+/* Daily/Weekly Toggles */
+.view-toggle-container {
+  display: flex;
+  background-color: var(--primary-light);
+  padding: 4px;
+  border-radius: var(--border-radius-sm);
+  width: fit-content;
+  align-self: flex-start;
+}
+
+.view-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-color);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.view-toggle-btn.active {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Weekly Table & Status Indicators */
+.status-badge-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.status-cell-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-indicator-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.indicator-present {
+  background-color: #ecfdf5;
+  color: var(--color-present);
+}
+
+.indicator-absent {
+  background-color: #fef2f2;
+  color: var(--color-on-leave);
+}
+
+.indicator-halfday {
+  background-color: #fffbeb;
+  color: var(--color-absent);
+}
+
+.indicator-leave {
+  background-color: #eff6ff;
+  color: var(--color-pending);
+}
+

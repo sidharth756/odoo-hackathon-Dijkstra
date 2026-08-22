@@ -32,6 +32,9 @@
   - **Lightweight SVG Icons**: Built `src/components/Icons.jsx` to provide outline SVG icons (matching Icons8 visual reference) without adding any heavy npm dependencies.
   - **Emoji Removal**: Scoured the entire source code and removed all user-facing emojis from buttons, tabs, headers, forms, empty states, and notifications.
   - **Icon Replacements**: Integrated SVG icons into `CheckInWidget`, `Login` demo buttons, `Dashboard` actions/search, `Profile` page controls, `TabPrivateInfo` labels, `TabSecurity` forms, `TabSalaryInfo` panels, `Attendance` tables, `TimeOff` balance cards, and global toast notifications.
+- **New Requirements (Permissions & Attendance Dashboard)**:
+  - **Strict Profile View Permissions**: Restructured edit controls so a regular employee can edit *only* address, phone, and avatar on their **own** profile (`loggedInUser.id === viewedProfile.id`), and can edit **nothing** (fully view-only with edit buttons hidden) when viewing another employee's profile. HR Admins can edit all fields as usual.
+  - **Admin Attendance Daily & Weekly Dashboard**: Implemented Daily and Weekly attendance views for HR Admins in `Attendance.jsx`. Daily view displays calculated statuses (`Present`, `Absent`, `Half-day`, `Leave`) for all employees for a selected date. Weekly view displays grid statuses (Mon-Sun) using color-coded indicator icons. Regular employees can only view their personal check-in/out timestamps and are locked out of admin controls.
 
 ## Integration Issues Resolved
 - Added safety checks in `Profile.jsx` to ensure newly registered or legacy employees without populated `salaryInfo` or `privateInfo` fields do not throw null pointer exceptions on profile render.
@@ -42,4 +45,4 @@
 - **Conflicts Resolved**: 0 merge conflicts.
 
 ## Current Status
-- **On track** (Phase 1, Phase 2, Phase 3, Phase 4, and UI Cleanup completed).
+- **On track** (All phases and new dashboard permissions fully completed).

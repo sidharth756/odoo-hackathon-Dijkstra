@@ -69,9 +69,10 @@ export default function Profile() {
 
   const isOwnProfile = currentUser.id === employee.id;
   const isAdmin = currentUser.role === 'HR';
+  const canUserEditProfile = isAdmin || isOwnProfile;
   
   // Rule checks
-  const canEdit = isEditing;
+  const canEdit = isEditing && canUserEditProfile;
   const isSalaryTabVisible = isAdmin; // Salary info is Admin-only
 
   // Update specific fields in nested form state
@@ -175,8 +176,8 @@ export default function Profile() {
           <TabPrivateInfo 
             employee={formData} 
             isEditing={canEdit} 
-            // regular employee can only edit phone, address, and avatar
-            isRestricted={!isAdmin && isOwnProfile}
+            // regular employee is restricted to allowed personal fields
+            isRestricted={!isAdmin}
             onChange={(field, val) => handleFieldChange('privateInfo', field, val)}
             onBaseFieldChange={(field, val) => handleFieldChange(null, field, val)}
           />
@@ -242,16 +243,15 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Action Controls */}
         <div className="profile-action-controls">
-          {!isEditing ? (
+          {canUserEditProfile && !isEditing ? (
             <button 
               className="profile-btn btn-edit" 
               onClick={() => setIsEditing(true)}
             >
               <PencilIcon size={14} style={{ marginRight: '6px' }} /> Edit Profile
             </button>
-          ) : (
+          ) : canUserEditProfile && isEditing ? (
             <div className="action-button-group">
               <button className="profile-btn btn-save" onClick={handleSave}>
                 <SaveIcon size={14} style={{ marginRight: '6px' }} /> Save
@@ -260,7 +260,7 @@ export default function Profile() {
                 <CloseIcon size={14} style={{ marginRight: '6px' }} /> Cancel
               </button>
             </div>
-          )}
+          ) : null}
           
           {!isOwnProfile && (
             <button 

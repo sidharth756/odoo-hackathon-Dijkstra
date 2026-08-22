@@ -136,7 +136,7 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
 
       {/* SECTION 2: Contact & Address */}
       <div className="info-section">
-        <h3><PhoneIcon size={18} style={{ marginRight: '6px' }} /> Contact &amp; Address</h3>
+        <h3 style={{ textAlign: 'center' }}><PhoneIcon size={18} style={{ marginRight: '6px' }} /> Contact &amp; Address</h3>
         <div className="pi-grid">
           <div className="pi-field">
             <label htmlFor="phone"><PhoneIcon size={14} style={{ marginRight: '6px' }} /> Phone Number</label>
