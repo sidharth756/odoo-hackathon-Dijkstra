@@ -146,6 +146,26 @@ export const AppProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [currentTab, setCurrentTab] = useState('dashboard');
+  const [viewedEmployeeId, setViewedEmployeeId] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
+  const showNotification = (message, type = 'success') => {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 4000);
+  };
+
+  useEffect(() => {
+    if (currentUser) {
+      setViewedEmployeeId(currentUser.id);
+    } else {
+      setViewedEmployeeId(null);
+    }
+  }, [currentUser]);
+
   useEffect(() => {
     localStorage.setItem('dayflow_employees', JSON.stringify(employees));
   }, [employees]);
@@ -423,6 +443,12 @@ export const AppProvider = ({ children }) => {
       attendance,
       leaves,
       currentUser,
+      currentTab,
+      setCurrentTab,
+      viewedEmployeeId,
+      setViewedEmployeeId,
+      notifications,
+      showNotification,
       login,
       logout,
       signup,

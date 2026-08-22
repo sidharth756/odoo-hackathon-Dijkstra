@@ -1,18 +1,55 @@
 import React, { useContext } from 'react';
 import { AppProvider, AppContext } from './context/AppContext';
 import Navbar from './components/Navbar';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import Attendance from './pages/Attendance';
+import TimeOff from './pages/TimeOff';
 import './styles/global.css';
 
 function MainApp() {
-  const { currentUser } = useContext(AppContext);
+  const { currentUser, currentTab, notifications } = useContext(AppContext);
+
+  // If no user is logged in, show the Auth screen
+  if (!currentUser) {
+    return <Login />;
+  }
+
+  // State-based Tab Switcher (custom router)
+  const renderActivePage = () => {
+    switch (currentTab) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'profile':
+        return <Profile />;
+      case 'attendance':
+        return <Attendance />;
+      case 'timeoff':
+        return <TimeOff />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
     <div className="app-container">
-      {currentUser && <Navbar />}
+      <Navbar />
       <main className="content">
-        <h1>Welcome to Dayflow HRMS</h1>
-        <p>Your team project skeleton is set up. Pull the changes from GitHub to start implementing your assigned tasks!</p>
+        {renderActivePage()}
       </main>
+
+      {/* Floating Toast Notification Container */}
+      <div className="toast-container">
+        {notifications.map((notif) => (
+          <div key={notif.id} className={`toast toast-${notif.type}`}>
+            <span className="toast-icon">
+              {notif.type === 'success' ? '✅' : notif.type === 'error' ? '❌' : 'ℹ️'}
+            </span>
+            <span className="toast-message">{notif.message}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
