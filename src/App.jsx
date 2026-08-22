@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Attendance from './pages/Attendance';
 import TimeOff from './pages/TimeOff';
+import { CheckCircleIcon, CloseIcon, WarningIcon } from './components/Icons';
 import './styles/global.css';
 
 function ToastContainer() {
@@ -15,7 +16,7 @@ function ToastContainer() {
       {notifications.map((notif) => (
         <div key={notif.id} className={`toast toast-${notif.type}`}>
           <span className="toast-icon">
-            {notif.type === 'success' ? '✅' : notif.type === 'error' ? '❌' : 'ℹ️'}
+            {notif.type === 'success' ? <CheckCircleIcon size={16} color="#ffffff" /> : notif.type === 'error' ? <CloseIcon size={16} color="#ffffff" /> : <WarningIcon size={16} color="#ffffff" />}
           </span>
           <span className="toast-message">{notif.message}</span>
         </div>

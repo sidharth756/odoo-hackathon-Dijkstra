@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import EmployeeCard from '../components/EmployeeCard';
 import CheckInWidget from '../components/CheckInWidget';
+import { UserPlusIcon, SearchIcon, UsersIcon, CloseIcon } from '../components/Icons';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -115,7 +116,7 @@ export default function Dashboard() {
                   className="profile-btn btn-save btn-add-employee" 
                   onClick={() => setIsAddModalOpen(true)}
                 >
-                  ➕ Add Employee
+                  <UserPlusIcon size={14} style={{ marginRight: '6px' }} /> Add Employee
                 </button>
               )}
             </div>
@@ -123,7 +124,7 @@ export default function Dashboard() {
           
           {/* Search bar */}
           <div className="search-bar-container">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><SearchIcon size={16} /></span>
             <input
               type="text"
               className="search-input"
@@ -143,7 +144,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="no-results">
-            <div className="no-results-icon">📂</div>
+            <div className="no-results-icon"><UsersIcon size={48} color="var(--text-muted)" /></div>
             <h3>No employees found</h3>
             <p>We couldn't find any results matching "{searchQuery}". Please check the spelling or try a different query.</p>
           </div>
@@ -155,8 +156,8 @@ export default function Dashboard() {
         <div className="modal-overlay" onClick={() => setIsAddModalOpen(false)}>
           <div className="modal-content glassmorphism" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>➕ Add New Employee</h2>
-              <button className="modal-close-btn" onClick={() => setIsAddModalOpen(false)}>✕</button>
+              <h2><UserPlusIcon size={20} style={{ marginRight: '8px' }} /> Add New Employee</h2>
+              <button className="modal-close-btn" onClick={() => setIsAddModalOpen(false)}><CloseIcon size={18} /></button>
             </div>
             
             <form onSubmit={handleAddEmployeeSubmit} className="modal-form">

@@ -1,4 +1,17 @@
 import React from 'react';
+import { 
+  UserIcon, 
+  CalendarIcon, 
+  GenderIcon, 
+  MaritalIcon, 
+  NationalityIcon, 
+  PhoneIcon, 
+  MailIcon, 
+  LocationIcon, 
+  BankIcon, 
+  KeyIcon, 
+  CardIcon 
+} from './Icons';
 
 export default function TabPrivateInfo({ employee, isEditing, isRestricted, onChange, onBaseFieldChange }) {
   const privateInfo = employee.privateInfo || {
@@ -29,12 +42,12 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
       {/* SECTION 1: Personal Identity */}
       <div className="info-section">
         <h3>
-          🪪 Personal Identity
+          <UserIcon size={18} style={{ marginRight: '6px' }} /> Personal Identity
           {isRestricted && <span className="restricted-badge">View Only</span>}
         </h3>
         <div className="pi-grid">
           <div className="pi-field">
-            <label htmlFor="dob">🎂 Date of Birth</label>
+            <label htmlFor="dob"><CalendarIcon size={14} style={{ marginRight: '6px' }} /> Date of Birth</label>
             {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <input
@@ -53,7 +66,7 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
           </div>
 
           <div className="pi-field">
-            <label htmlFor="gender">⚧ Gender</label>
+            <label htmlFor="gender"><GenderIcon size={14} style={{ marginRight: '6px' }} /> Gender</label>
             {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <select
@@ -76,7 +89,7 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
           </div>
 
           <div className="pi-field">
-            <label htmlFor="maritalStatus">💍 Marital Status</label>
+            <label htmlFor="maritalStatus"><MaritalIcon size={14} style={{ marginRight: '6px' }} /> Marital Status</label>
             {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <select
@@ -100,7 +113,7 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
           </div>
 
           <div className="pi-field">
-            <label htmlFor="nationality">🌍 Nationality</label>
+            <label htmlFor="nationality"><NationalityIcon size={14} style={{ marginRight: '6px' }} /> Nationality</label>
             {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <input
@@ -123,10 +136,10 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
 
       {/* SECTION 2: Contact & Address */}
       <div className="info-section">
-        <h3>📞 Contact &amp; Address</h3>
+        <h3><PhoneIcon size={18} style={{ marginRight: '6px' }} /> Contact &amp; Address</h3>
         <div className="pi-grid">
           <div className="pi-field">
-            <label htmlFor="phone">📱 Phone Number</label>
+            <label htmlFor="phone"><PhoneIcon size={14} style={{ marginRight: '6px' }} /> Phone Number</label>
             {canEditField(false) ? (
               <div className="pi-input-wrap">
                 <input
@@ -146,8 +159,8 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
           </div>
 
           <div className="pi-field">
-            <label htmlFor="personalEmail">✉️ Personal Email</label>
-            {canEditField(false) ? (
+            <label htmlFor="personalEmail"><MailIcon size={14} style={{ marginRight: '6px' }} /> Personal Email</label>
+            {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <input
                   type="email"
@@ -166,7 +179,7 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
           </div>
 
           <div className="pi-field pi-field-full">
-            <label htmlFor="address">🏠 Permanent Address</label>
+            <label htmlFor="address"><LocationIcon size={14} style={{ marginRight: '6px' }} /> Permanent Address</label>
             {canEditField(false) ? (
               <div className="pi-input-wrap">
                 <input
@@ -190,12 +203,12 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
       {/* SECTION 3: Bank Details */}
       <div className="info-section">
         <h3>
-          🏦 Bank Details
+          <BankIcon size={18} style={{ marginRight: '6px' }} /> Bank Details
           {isRestricted && <span className="restricted-badge">View Only</span>}
         </h3>
         <div className="pi-grid">
           <div className="pi-field">
-            <label htmlFor="bankName">🏛️ Bank Name</label>
+            <label htmlFor="bankName"><BankIcon size={14} style={{ marginRight: '6px' }} /> Bank Name</label>
             {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <input
@@ -215,7 +228,7 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
           </div>
 
           <div className="pi-field">
-            <label htmlFor="ifsc">🔢 IFSC Code</label>
+            <label htmlFor="ifsc"><KeyIcon size={14} style={{ marginRight: '6px' }} /> IFSC Code</label>
             {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <input
@@ -235,7 +248,7 @@ export default function TabPrivateInfo({ employee, isEditing, isRestricted, onCh
           </div>
 
           <div className="pi-field pi-field-full">
-            <label htmlFor="accountNo">💳 Account Number</label>
+            <label htmlFor="accountNo"><CardIcon size={14} style={{ marginRight: '6px' }} /> Account Number</label>
             {canEditField(true) ? (
               <div className="pi-input-wrap">
                 <input

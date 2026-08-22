@@ -4,6 +4,7 @@ import TabResume from '../components/TabResume';
 import TabPrivateInfo from '../components/TabPrivateInfo';
 import TabSalaryInfo from '../components/TabSalaryInfo';
 import TabSecurity from '../components/TabSecurity';
+import { PencilIcon, SaveIcon, CloseIcon, LogoutIcon, BackIcon, CameraIcon } from '../components/Icons';
 import '../styles/profile.css';
 
 export default function Profile() {
@@ -88,7 +89,34 @@ export default function Profile() {
 
   const handleSave = () => {
     try {
-      updateProfile(employee.id, formData);
+      let finalData = { ...formData };
+      if (!isAdmin) {
+        // If not admin, restore all restricted fields to original values to enforce permissions
+        finalData.name = employee.name;
+        finalData.email = employee.email;
+        finalData.role = employee.role;
+        finalData.id = employee.id;
+        
+        if (employee.privateInfo) {
+          finalData.privateInfo = {
+            ...formData.privateInfo,
+            dob: employee.privateInfo.dob,
+            gender: employee.privateInfo.gender,
+            maritalStatus: employee.privateInfo.maritalStatus,
+            nationality: employee.privateInfo.nationality,
+            personalEmail: employee.privateInfo.personalEmail,
+            bankName: employee.privateInfo.bankName,
+            ifsc: employee.privateInfo.ifsc,
+            accountNo: employee.privateInfo.accountNo
+          };
+        }
+        
+        if (employee.salaryInfo) {
+          finalData.salaryInfo = { ...employee.salaryInfo };
+        }
+      }
+
+      updateProfile(employee.id, finalData);
       setIsEditing(false);
       showNotification('Profile updated successfully!', 'success');
     } catch (err) {
@@ -193,7 +221,7 @@ export default function Profile() {
             
             {canEdit && (
               <div className="avatar-upload-overlay">
-                <span>📷 Upload</span>
+                <span><CameraIcon size={14} style={{ marginRight: '4px' }} /> Upload</span>
               </div>
             )}
             <input 
@@ -221,15 +249,15 @@ export default function Profile() {
               className="profile-btn btn-edit" 
               onClick={() => setIsEditing(true)}
             >
-              📝 Edit Profile
+              <PencilIcon size={14} style={{ marginRight: '6px' }} /> Edit Profile
             </button>
           ) : (
             <div className="action-button-group">
               <button className="profile-btn btn-save" onClick={handleSave}>
-                💾 Save
+                <SaveIcon size={14} style={{ marginRight: '6px' }} /> Save
               </button>
               <button className="profile-btn btn-cancel" onClick={handleCancel}>
-                ❌ Cancel
+                <CloseIcon size={14} style={{ marginRight: '6px' }} /> Cancel
               </button>
             </div>
           )}
@@ -239,13 +267,13 @@ export default function Profile() {
               className="profile-btn btn-back"
               onClick={() => setCurrentTab('dashboard')}
             >
-              ⬅️ Back to List
+              <BackIcon size={14} style={{ marginRight: '6px' }} /> Back to List
             </button>
           )}
 
           {isOwnProfile && (
             <button className="profile-btn btn-logout" onClick={logout}>
-              🚪 Sign Out
+              <LogoutIcon size={14} style={{ marginRight: '6px' }} /> Sign Out
             </button>
           )}
         </div>

@@ -1,5 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
+import { 
+  CalendarIcon, 
+  PlusIcon, 
+  WalletIcon, 
+  HeartIcon, 
+  ResumeIcon, 
+  CheckCircleIcon, 
+  CloseIcon 
+} from '../components/Icons';
 import '../styles/timeoff.css';
 
 export default function TimeOff() {
@@ -149,14 +158,14 @@ export default function TimeOff() {
       {/* Page Header */}
       <section className="timeoff-header-card card glassmorphism">
         <div className="timeoff-title-area">
-          <span className="page-icon">🏖️</span>
+          <span className="page-icon"><CalendarIcon size={24} /></span>
           <div>
             <h1>Time Off & Leaves</h1>
             <p className="subtitle">Submit leave requests, check your remaining balances, and track approvals.</p>
           </div>
         </div>
         <button className="timeoff-action-btn" onClick={() => setModalOpen(true)}>
-          ➕ Request Time Off
+          <PlusIcon size={14} style={{ marginRight: '6px' }} /> Request Time Off
         </button>
       </section>
 
@@ -168,7 +177,7 @@ export default function TimeOff() {
             <p className="balance-days">{paidBalance} <span>Days left</span></p>
             <p className="balance-total">Used: {approvedPaid} of 24 days</p>
           </div>
-          <span className="balance-icon">🌴</span>
+          <span className="balance-icon"><WalletIcon size={24} color="var(--primary-color)" /></span>
         </div>
 
         <div className="balance-card card">
@@ -177,7 +186,7 @@ export default function TimeOff() {
             <p className="balance-days">{sickBalance} <span>Days left</span></p>
             <p className="balance-total">Used: {approvedSick} of 10 days</p>
           </div>
-          <span className="balance-icon">🤒</span>
+          <span className="balance-icon"><HeartIcon size={24} color="var(--color-on-leave)" /></span>
         </div>
 
         <div className="balance-card card">
@@ -186,7 +195,7 @@ export default function TimeOff() {
             <p className="balance-days">-- <span>Days used</span></p>
             <p className="balance-total">Always available</p>
           </div>
-          <span className="balance-icon">📁</span>
+          <span className="balance-icon"><ResumeIcon size={24} color="var(--text-muted)" /></span>
         </div>
       </section>
 
@@ -281,7 +290,7 @@ export default function TimeOff() {
               </table>
             ) : (
               <div className="empty-approvals">
-                <span className="empty-icon">🎉</span>
+                <span className="empty-icon"><CheckCircleIcon size={48} color="var(--primary-color)" /></span>
                 <h4>All caught up!</h4>
                 <p>There are no pending leave requests to review.</p>
               </div>
@@ -296,7 +305,7 @@ export default function TimeOff() {
           <div className="modal-content card glassmorphism">
             <div className="modal-header">
               <h2>Request Time Off</h2>
-              <button className="close-modal-btn" onClick={() => setModalOpen(false)}>×</button>
+              <button className="close-modal-btn" onClick={() => setModalOpen(false)}><CloseIcon size={18} /></button>
             </div>
             
             <form onSubmit={handleSubmit} className="leave-form">

@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
+import { LockIcon } from './Icons';
 
 export default function TabSalaryInfo({ employee, isEditing, onChange }) {
   const { currentUser } = useContext(AppContext);
@@ -8,7 +9,7 @@ export default function TabSalaryInfo({ employee, isEditing, onChange }) {
     return (
       <div className="tab-salary-container">
         <p className="security-notice">
-          🔒 Salary details can only be viewed and edited by HR Administrators. Regular access is restricted.
+          <LockIcon size={14} style={{ marginRight: '6px' }} /> Salary details can only be viewed and edited by HR Administrators. Regular access is restricted.
         </p>
       </div>
     );

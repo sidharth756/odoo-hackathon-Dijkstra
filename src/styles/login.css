@@ -161,19 +161,36 @@
 .form-group select {
   width: 100%;
   font-size: 14px;
-  padding: 11px 14px;
+  padding: 11.5px 14px;
+  border: 1.5px solid rgba(113, 75, 103, 0.15);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s ease;
+  color: var(--text-main);
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary-color);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(113, 75, 103, 0.08);
 }
 
 .submit-auth-btn {
   width: 100%;
-  padding: 12px;
+  padding: 12.5px;
   background-color: var(--primary-color);
   color: #ffffff;
   font-weight: 700;
   font-size: 14px;
-  border-radius: var(--border-radius-sm);
+  border-radius: 8px;
+  border: none;
   margin-top: 8px;
   box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
 .submit-auth-btn:hover {
