@@ -6,6 +6,9 @@ export default function TimeOff() {
   const { currentUser, leaves, employees, requestLeave, updateLeaveStatus } = useContext(AppContext);
   const isHR = currentUser?.role === 'HR';
 
+  // Calendar navigation state
+  const [calendarDate, setCalendarDate] = useState(new Date());
+
   // State for request leave modal
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [leaveType, setLeaveType] = useState('Paid');
@@ -13,6 +16,7 @@ export default function TimeOff() {
   const [endDate, setEndDate] = useState('');
   const [remarks, setRemarks] = useState('');
   const [days, setDays] = useState(1);
+  const [attachmentName, setAttachmentName] = useState(''); // File attachment state
 
   // State for review/comment modal
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -44,7 +48,7 @@ export default function TimeOff() {
   const adminFilteredLeaves = leaves
     .filter((l) => {
       const emp = employees.find((e) => e.id === l.employeeId);
-      const matchesSearch = emp?.name.toLowerCase().includes(searchEmployee.toLowerCase()) || 
+      const matchesSearch = emp?.name.toLowerCase().includes(searchEmployee.toLowerCase()) ||
                             l.employeeId.toLowerCase().includes(searchEmployee.toLowerCase());
       const matchesStatus = statusFilter === 'All' ? true : l.status === statusFilter;
       return matchesSearch && matchesStatus;
@@ -63,7 +67,8 @@ export default function TimeOff() {
       startDate,
       endDate,
       days: Number(days),
-      remarks
+      remarks,
+      attachment: attachmentName // Send mock filename
     });
     // Reset state
     setLeaveType('Paid');
@@ -71,6 +76,7 @@ export default function TimeOff() {
     setEndDate('');
     setRemarks('');
     setDays(1);
+    setAttachmentName('');
     setShowApplyModal(false);
   };
 
@@ -99,8 +105,44 @@ export default function TimeOff() {
     }
   };
 
+  // --- CALENDAR GENERATION ---
+  const calendarYear = calendarDate.getFullYear();
+  const calendarMonth = calendarDate.getMonth();
+
+  const handlePrevMonth = () => setCalendarDate(new Date(calendarYear, calendarMonth - 1, 1));
+  const handleNextMonth = () => setCalendarDate(new Date(calendarYear, calendarMonth + 1, 1));
+
+  const getCalendarDays = () => {
+    const firstDay = new Date(calendarYear, calendarMonth, 1);
+    // Get Mon-based start day index (0=Mon, 1=Tue, ..., 6=Sun)
+    let startDayOfWeek = firstDay.getDay();
+    startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+
+    const totalDaysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const daysArr = [];
+
+    // Pad previous month days
+    for (let i = 0; i < startDayOfWeek; i++) {
+      daysArr.push(null);
+    }
+
+    // Add days of the month
+    for (let i = 1; i <= totalDaysInMonth; i++) {
+      daysArr.push(i);
+    }
+
+    return daysArr;
+  };
+
+  const calendarDays = getCalendarDays();
+  const weekDaysShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
   return (
-    <div className="content text-left">
+    <div className="content text-left timeoff-page">
       <div className="header-section" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ margin: '0 0 8px', fontSize: '2.5rem', color: 'var(--text-h)' }}>Time Off & Leaves</h1>
@@ -131,7 +173,7 @@ export default function TimeOff() {
         )}
       </div>
 
-      {/* Leave Balances Grid (Shown to regular users and admins can see their own) */}
+      {/* Leave Balances Grid (Employee only) */}
       {!isHR && (
         <div style={{
           display: 'grid',
@@ -142,7 +184,7 @@ export default function TimeOff() {
           {Object.entries(balances).map(([key, item]) => {
             const remaining = item.limit - item.used;
             return (
-              <div key={key} style={{
+              <div key={key} className="balance-card" style={{
                 background: '#ffffff',
                 border: '1px solid var(--border)',
                 borderRadius: '16px',
@@ -176,7 +218,103 @@ export default function TimeOff() {
         </div>
       )}
 
-      {/* Layout Split */}
+      {/* GRAPHICAL MONTHLY LEAVE CALENDAR */}
+      <div style={{ background: '#ffffff', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow)', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-h)' }}>
+            {isHR ? "Leave Calendar (All Employees)" : "Your Leave Calendar"}
+          </h3>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              onClick={handlePrevMonth}
+              style={{ padding: '6px 12px', border: '1px solid var(--border)', borderRadius: '6px', background: '#ffffff', cursor: 'pointer', fontWeight: 'bold' }}
+              onMouseEnter={(e) => e.target.style.background = '#f8f9fa'}
+              onMouseLeave={(e) => e.target.style.background = '#ffffff'}
+            >
+              &lt;
+            </button>
+            <strong style={{ minWidth: '150px', textAlign: 'center', fontSize: '1rem', color: 'var(--text-h)' }}>
+              {monthNames[calendarMonth]} {calendarYear}
+            </strong>
+            <button
+              onClick={handleNextMonth}
+              style={{ padding: '6px 12px', border: '1px solid var(--border)', borderRadius: '6px', background: '#ffffff', cursor: 'pointer', fontWeight: 'bold' }}
+              onMouseEnter={(e) => e.target.style.background = '#f8f9fa'}
+              onMouseLeave={(e) => e.target.style.background = '#ffffff'}
+            >
+              &gt;
+            </button>
+          </div>
+        </div>
+
+        {/* Calendar Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', textAlign: 'center' }}>
+          {weekDaysShort.map((day, idx) => (
+            <div key={idx} style={{ fontWeight: 'bold', padding: '8px 0', borderBottom: '1px solid var(--border)', color: 'var(--text-h)', fontSize: '0.9rem' }}>
+              {day}
+            </div>
+          ))}
+          {calendarDays.map((day, idx) => {
+            if (day === null) {
+              return <div key={idx} style={{ background: '#f8f9fa', borderRadius: '8px', minHeight: '70px' }}></div>;
+            }
+
+            const cellDateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+            // Filter leaves covering this cell date
+            const activeLeaves = leaves.filter((l) => {
+              const isOwner = isHR ? true : l.employeeId === currentUser?.id;
+              return isOwner && cellDateStr >= l.startDate && cellDateStr <= l.endDate;
+            });
+
+            return (
+              <div key={idx} className="calendar-day" style={{
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                minHeight: '70px',
+                padding: '4px',
+                textAlign: 'left',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                background: activeLeaves.length > 0 ? '#fffef2' : '#ffffff',
+                boxSizing: 'border-box'
+              }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-h)' }}>{day}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflowY: 'auto', maxHeight: '50px' }}>
+                  {activeLeaves.map((l, lIdx) => {
+                    const emp = employees.find((e) => e.id === l.employeeId);
+                    return (
+                      <span key={lIdx} title={`${emp?.name || 'User'}: ${l.type} - ${l.status}\n"${l.remarks}"`} style={{
+                        display: 'block',
+                        fontSize: '0.65rem',
+                        padding: '2px 4px',
+                        borderRadius: '4px',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        fontWeight: '600',
+                        backgroundColor:
+                          l.status === 'Approved' ? 'rgba(40,167,69,0.12)' :
+                          l.status === 'Pending' ? 'rgba(255,193,7,0.15)' :
+                          'rgba(220,53,69,0.12)',
+                        color:
+                          l.status === 'Approved' ? 'var(--success)' :
+                          l.status === 'Pending' ? '#d39e00' :
+                          'var(--danger)'
+                      }}>
+                        {isHR ? `${emp?.name.split(' ')[0]}: ` : ""}{l.type}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Requests Lists */}
       <div style={{ width: '100%' }}>
         {!isHR ? (
           // USER PORTAL: LEAVE REQUEST HISTORY
@@ -192,6 +330,7 @@ export default function TimeOff() {
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Leave Details</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Duration</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Remarks</th>
+                      <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Attachment</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Status</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>HR Comments</th>
                     </tr>
@@ -210,6 +349,11 @@ export default function TimeOff() {
                           </span>
                         </td>
                         <td style={{ padding: '12px 8px', color: 'var(--text)', fontSize: '0.9rem' }}>{req.remarks || '--'}</td>
+                        <td style={{ padding: '12px 8px', color: 'var(--text)', fontSize: '0.9rem' }}>
+                          {req.attachment ? (
+                            <span style={{ color: 'var(--secondary-color)', fontWeight: '500' }}>📄 {req.attachment}</span>
+                          ) : '--'}
+                        </td>
                         <td style={{ padding: '12px 8px' }}>
                           <span style={{
                             display: 'inline-block',
@@ -217,13 +361,13 @@ export default function TimeOff() {
                             borderRadius: '12px',
                             fontSize: '0.8rem',
                             fontWeight: '700',
-                            backgroundColor: 
-                              req.status === 'Approved' ? 'rgba(40,167,69,0.1)' : 
-                              req.status === 'Pending' ? 'rgba(255,193,7,0.1)' : 
+                            backgroundColor:
+                              req.status === 'Approved' ? 'rgba(40,167,69,0.1)' :
+                              req.status === 'Pending' ? 'rgba(255,193,7,0.1)' :
                               'rgba(220,53,69,0.1)',
-                            color: 
-                              req.status === 'Approved' ? 'var(--success)' : 
-                              req.status === 'Pending' ? 'var(--warning)' : 
+                            color:
+                              req.status === 'Approved' ? 'var(--success)' :
+                              req.status === 'Pending' ? 'var(--warning)' :
                               'var(--danger)'
                           }}>
                             {req.status}
@@ -243,7 +387,7 @@ export default function TimeOff() {
           // HR ADMIN VIEW: APPROVALS & FILTER PANEL
           <div style={{ background: '#ffffff', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow)' }}>
             <h3 style={{ margin: '0 0 20px', fontSize: '1.25rem', color: 'var(--text-h)' }}>Leave Management Dashboard</h3>
-            
+
             {/* Filter and Search Panel */}
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: '200px' }}>
@@ -298,6 +442,7 @@ export default function TimeOff() {
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Leave Details</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Duration</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Remarks</th>
+                      <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Attachment</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Status</th>
                       <th style={{ padding: '12px 8px', color: 'var(--text-h)', fontWeight: '600' }}>Actions</th>
                     </tr>
@@ -320,6 +465,11 @@ export default function TimeOff() {
                             <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text)' }}>{l.startDate} to {l.endDate}</span>
                           </td>
                           <td style={{ padding: '12px 8px', color: 'var(--text)', fontSize: '0.9rem' }}>{l.remarks || '--'}</td>
+                          <td style={{ padding: '12px 8px', color: 'var(--text)', fontSize: '0.9rem' }}>
+                            {l.attachment ? (
+                              <span style={{ color: 'var(--secondary-color)', fontWeight: '500' }}>📄 {l.attachment}</span>
+                            ) : '--'}
+                          </td>
                           <td style={{ padding: '12px 8px' }}>
                             <span style={{
                               display: 'inline-block',
@@ -327,13 +477,13 @@ export default function TimeOff() {
                               borderRadius: '12px',
                               fontSize: '0.8rem',
                               fontWeight: '700',
-                              backgroundColor: 
-                                l.status === 'Approved' ? 'rgba(40,167,69,0.1)' : 
-                                l.status === 'Pending' ? 'rgba(255,193,7,0.1)' : 
+                              backgroundColor:
+                                l.status === 'Approved' ? 'rgba(40,167,69,0.1)' :
+                                l.status === 'Pending' ? 'rgba(255,193,7,0.1)' :
                                 'rgba(220,53,69,0.1)',
-                              color: 
-                                l.status === 'Approved' ? 'var(--success)' : 
-                                l.status === 'Pending' ? 'var(--warning)' : 
+                              color:
+                                l.status === 'Approved' ? 'var(--success)' :
+                                l.status === 'Pending' ? 'var(--warning)' :
                                 'var(--danger)'
                             }}>
                               {l.status}
@@ -467,20 +617,50 @@ export default function TimeOff() {
                 />
               </div>
 
-              <div style={{ marginBottom: '24px' }}>
+              <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text)', marginBottom: '6px' }}>Remarks / Reason</label>
                 <textarea
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   placeholder="Explain why you are requesting this leave..."
-                  style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.95rem', minHeight: '80px', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.95rem', minHeight: '60px', fontFamily: 'inherit', boxSizing: 'border-box' }}
                 ></textarea>
+              </div>
+
+              {/* MOCK ATTACHMENT/FILE INPUT */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text)', marginBottom: '6px' }}>Attachment (Mock)</label>
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setAttachmentName(file.name);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                {attachmentName && (
+                  <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--success)', marginTop: '6px', fontWeight: '600' }}>
+                    Selected: {attachmentName}
+                  </span>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
-                  onClick={() => setShowApplyModal(false)}
+                  onClick={() => {
+                    setAttachmentName('');
+                    setShowApplyModal(false);
+                  }}
                   style={{
                     backgroundColor: '#e9ecef',
                     color: 'var(--text-primary)',

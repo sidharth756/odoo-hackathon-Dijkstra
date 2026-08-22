@@ -11,3 +11,92 @@
   --warning: #ffc107;
   --danger: #dc3545;
 }
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+/* Dev Login Styles */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 20px;
+  text-align: center;
+}
+
+.login-container h2 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.login-container p {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+}
+
+.user-selection-grid {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 800px;
+}
+
+.dev-login-btn {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 18px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  min-width: 200px;
+}
+
+.dev-login-btn:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary-color);
+  box-shadow: 0 10px 15px rgba(113, 75, 103, 0.1);
+}
+
+.dev-login-btn strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.dev-login-btn span {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  background-color: rgba(113, 75, 103, 0.08);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+

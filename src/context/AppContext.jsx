@@ -146,6 +146,8 @@ export const AppProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [activeTab, setActiveTab] = useState('dashboard');
+
   useEffect(() => {
     localStorage.setItem('dayflow_employees', JSON.stringify(employees));
   }, [employees]);
@@ -423,6 +425,8 @@ export const AppProvider = ({ children }) => {
       attendance,
       leaves,
       currentUser,
+      activeTab,
+      setActiveTab,
       login,
       logout,
       signup,
