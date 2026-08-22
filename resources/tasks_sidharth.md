@@ -24,12 +24,13 @@
 - [x] Create global toast/notification helper in context and UI container
 
 ## Phase 4: Integration & Visual Polish (3:00 PM - 5:00 PM)
-- [ ] Merge `feature/auth-profile` (Rujitha) and `feature/attendance-timeoff` (Shebha) into `main`
-- [ ] Resolve merge conflicts
-- [ ] Apply premium styling polish (Smooth transitions, hover effects, glassmorphism shadows)
-- [ ] Verify responsively works on desktop, tablet, and mobile views
+- [x] Merge `feature/auth-profile` (Rujitha) and `feature/attendance-timeoff` (Shebha) into `main`
+- [x] Resolve merge conflicts
+- [x] Apply premium styling polish (Smooth transitions, hover effects, glassmorphism shadows)
+- [x] Verify responsively works on desktop, tablet, and mobile views
 
 ## Phase 5: Final Review & Deliver (5:00 PM - 5:30 PM)
-- [ ] End-to-end user journey checks
-- [ ] Build production version to verify no build warnings/errors (`npm run build`)
-- [ ] Push clean final code to main
+- [x] End-to-end user journey checks
+- [x] Build production version to verify no build warnings/errors (`npm run build`)
+- [x] Push clean final code to main
+
