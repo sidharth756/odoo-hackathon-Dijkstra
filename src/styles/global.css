@@ -155,8 +155,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(113, 75, 103, 0.12);
+  transform: translateY(-3px);
+  border-color: rgba(113, 75, 103, 0.12);
 }
 
 .glassmorphism {
@@ -174,8 +175,11 @@ input:focus, select:focus, textarea:focus {
   left: 0;
   width: 100%;
   z-index: 1000;
-  border-bottom: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 1px 16px rgba(113, 75, 103, 0.06);
 }
 
 .header-container {
