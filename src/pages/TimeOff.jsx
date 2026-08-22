@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-<<<<<<< HEAD
 import { 
   CalendarIcon, 
   PlusIcon, 
@@ -8,11 +7,10 @@ import {
   HeartIcon, 
   ResumeIcon, 
   CheckCircleIcon, 
-  CloseIcon 
+  CloseIcon,
+  PalmIcon,
+  XIcon
 } from '../components/Icons';
-=======
-import { PalmIcon, XIcon, PlusIcon } from '../components/Icons';
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
 import '../styles/timeoff.css';
 
 export default function TimeOff() {
@@ -26,7 +24,6 @@ export default function TimeOff() {
   } = useContext(AppContext);
 
   // States
-  const [calendarDate, setCalendarDate] = useState(new Date());
   const [modalOpen, setModalOpen] = useState(false);
   const [leaveType, setLeaveType] = useState('Paid');
   const [startDate, setStartDate] = useState('');
@@ -34,21 +31,31 @@ export default function TimeOff() {
   const [remarks, setRemarks] = useState('');
   const [attachment, setAttachment] = useState('');
 
-  // Admin filters
-  const [searchEmployee, setSearchEmployee] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-
-  // Admin approval comments modal state
+  // Review states (HR Admin)
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [reviewingLeaveId, setReviewingLeaveId] = useState(null);
-  const [reviewStatus, setReviewStatus] = useState(''); // 'Approved' | 'Rejected'
   const [reviewComments, setReviewComments] = useState('');
+  const [reviewStatus, setReviewStatus] = useState(''); // 'Approved' | 'Rejected'
+  const [reviewingLeaveId, setReviewingLeaveId] = useState(null);
+
+  // Calendar navigation states
+  const today = new Date();
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth()); // 0-11
+  const [calendarYear, setCalendarYear] = useState(today.getFullYear());
+
+  // Filter/Search states (HR Admin)
+  const [searchEmployee, setSearchEmployee] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All'); // 'All' | 'Pending' | 'Approved' | 'Rejected'
 
   if (!currentUser) return null;
 
   const isAdmin = currentUser.role === 'HR';
 
-  // Calculate balances (Only Approved leaves reduce balances)
+  // Retrieve leaves for current user
+  const myRequests = leaves
+    .filter(l => l.employeeId === currentUser.id)
+    .sort((a, b) => b.id - a.id);
+
+  // Balances calculation for logged-in user
   const getApprovedDays = (type) => {
     return leaves
       .filter(l => l.employeeId === currentUser.id && l.type === type && l.status === 'Approved')
@@ -62,20 +69,18 @@ export default function TimeOff() {
   const paidBalance = Math.max(0, 24 - approvedPaid);
   const sickBalance = Math.max(0, 10 - approvedSick);
 
-  // Filtered leaves list for HR Admin Dashboard
-  const adminFilteredLeaves = leaves
-    .filter((l) => {
-      const emp = employees.find((e) => e.id === l.employeeId) || { name: 'Unknown' };
-      const matchesSearch = emp.name.toLowerCase().includes(searchEmployee.toLowerCase()) ||
-                            l.employeeId.toLowerCase().includes(searchEmployee.toLowerCase());
-      const matchesStatus = statusFilter === 'All' ? true : l.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => b.id - a.id);
+  // HR Admin filtering
+  const adminFilteredLeaves = leaves.filter(l => {
+    const emp = employees.find(e => e.id === l.employeeId);
+    const empName = emp ? emp.name.toLowerCase() : 'unknown';
+    const empId = l.employeeId.toLowerCase();
+    const query = searchEmployee.toLowerCase();
+    
+    const matchesSearch = empName.includes(query) || empId.includes(query);
+    const matchesStatus = statusFilter === 'All' || l.status === statusFilter;
 
-  const myRequests = leaves
-    .filter((l) => l.employeeId === currentUser.id)
-    .sort((a, b) => b.id - a.id);
+    return matchesSearch && matchesStatus;
+  }).sort((a, b) => b.id - a.id);
 
   // Submit leave request
   const handleSubmit = (e) => {
@@ -94,7 +99,7 @@ export default function TimeOff() {
       return;
     }
 
-    // Calculate inclusive leave days
+    // Calculate days
     const diffTime = Math.abs(end - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
@@ -129,7 +134,7 @@ export default function TimeOff() {
     setModalOpen(false);
   };
 
-  // Approval review trigger
+  // Trigger review comments modal
   const handleReviewTrigger = (leaveId, status) => {
     setReviewingLeaveId(leaveId);
     setReviewStatus(status);
@@ -137,47 +142,55 @@ export default function TimeOff() {
     setReviewModalOpen(true);
   };
 
+  // Submit HR review decision
   const handleReviewSubmit = (e) => {
     e.preventDefault();
-    if (!reviewingLeaveId || !reviewStatus) return;
+    if (!reviewingLeaveId) return;
 
     updateLeaveStatus(reviewingLeaveId, reviewStatus, reviewComments);
     showNotification(`Leave request ${reviewStatus.toLowerCase()} successfully.`, 'success');
-
-    // Reset and close
+    
     setReviewingLeaveId(null);
     setReviewStatus('');
     setReviewComments('');
     setReviewModalOpen(false);
   };
 
-  // --- CALENDAR GENERATION ---
-  const calendarYear = calendarDate.getFullYear();
-  const calendarMonth = calendarDate.getMonth();
+  // Calendar logic helpers
+  const handlePrevMonth = () => {
+    if (calendarMonth === 0) {
+      setCalendarMonth(11);
+      setCalendarYear(prev => prev - 1);
+    } else {
+      setCalendarMonth(prev => prev - 1);
+    }
+  };
 
-  const handlePrevMonth = () => setCalendarDate(new Date(calendarYear, calendarMonth - 1, 1));
-  const handleNextMonth = () => setCalendarDate(new Date(calendarYear, calendarMonth + 1, 1));
+  const handleNextMonth = () => {
+    if (calendarMonth === 11) {
+      setCalendarMonth(0);
+      setCalendarYear(prev => prev + 1);
+    } else {
+      setCalendarMonth(prev => prev + 1);
+    }
+  };
 
+  // Get calendar days array
   const getCalendarDays = () => {
-    const firstDay = new Date(calendarYear, calendarMonth, 1);
-    // Get Mon-based start day index (0=Mon, 1=Tue, ..., 6=Sun)
-    let startDayOfWeek = firstDay.getDay();
-    startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
-
-    const totalDaysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-    const daysArr = [];
-
-    // Pad previous month days
-    for (let i = 0; i < startDayOfWeek; i++) {
-      daysArr.push(null);
+    const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay(); // Sun=0, Mon=1...
+    // Align so Monday is the first day (0=Mon, 1=Tue, ..., 6=Sun)
+    const startOffset = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+    
+    const totalDays = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    
+    const days = [];
+    for (let i = 0; i < startOffset; i++) {
+      days.push(null);
     }
-
-    // Add days of the month
-    for (let i = 1; i <= totalDaysInMonth; i++) {
-      daysArr.push(i);
+    for (let i = 1; i <= totalDays; i++) {
+      days.push(i);
     }
-
-    return daysArr;
+    return days;
   };
 
   const calendarDays = getCalendarDays();
@@ -188,242 +201,79 @@ export default function TimeOff() {
   ];
 
   return (
-    <div className="content text-left timeoff-page">
+    <div className="timeoff-page-container">
       {/* Page Header */}
-<<<<<<< HEAD
-      <section className="timeoff-header-card card glassmorphism">
+      <section className="timeoff-header-card card glassmorphism" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', padding: '24px 32px' }}>
         <div className="timeoff-title-area">
-          <span className="page-icon"><CalendarIcon size={24} /></span>
-=======
-      <div className="timeoff-header-card card glassmorphism" style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', padding: '20px' }}>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <PalmIcon size={32} className="page-svg-icon" style={{ color: 'var(--primary-color)' }} />
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
+          <span className="page-icon"><PalmIcon size={24} /></span>
           <div>
-            <h1 style={{ margin: '0 0 4px', fontSize: '2rem', color: 'var(--text-primary)' }}>Time Off & Leaves</h1>
-            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-              Request leaves, track your balances, and manage administrative leave approvals.
+            <h1>Time Off & Leaves</h1>
+            <p className="subtitle">
+              {isAdmin 
+                ? 'Review leave history and manage administrative leave approvals.' 
+                : 'Submit leave requests, check your remaining balances, and track approvals.'
+              }
             </p>
           </div>
         </div>
-<<<<<<< HEAD
-        <button className="timeoff-action-btn" onClick={() => setModalOpen(true)}>
-          <PlusIcon size={14} style={{ marginRight: '6px' }} /> Request Time Off
-        </button>
-      </section>
-
-      {/* Leave Balance Cards */}
-      <section className="balances-grid">
-        <div className="balance-card card">
-          <div className="balance-info">
-            <h3>Paid Time Off</h3>
-            <p className="balance-days">{paidBalance} <span>Days left</span></p>
-            <p className="balance-total">Used: {approvedPaid} of 24 days</p>
-          </div>
-          <span className="balance-icon"><WalletIcon size={24} color="var(--primary-color)" /></span>
-        </div>
-
-        <div className="balance-card card">
-          <div className="balance-info">
-            <h3>Sick Leave</h3>
-            <p className="balance-days">{sickBalance} <span>Days left</span></p>
-            <p className="balance-total">Used: {approvedSick} of 10 days</p>
-          </div>
-          <span className="balance-icon"><HeartIcon size={24} color="var(--color-on-leave)" /></span>
-        </div>
-
-        <div className="balance-card card">
-          <div className="balance-info">
-            <h3>Unpaid Leave</h3>
-            <p className="balance-days">-- <span>Days used</span></p>
-            <p className="balance-total">Always available</p>
-          </div>
-          <span className="balance-icon"><ResumeIcon size={24} color="var(--text-muted)" /></span>
-        </div>
-      </section>
-
-      {/* Main Content splits (Calendar vs Lists) */}
-      <div className="timeoff-content-split">
-        {/* Calendar Side */}
-        <section className="calendar-section card">
-          <h3 className="section-title">Leave Calendar (August 2026)</h3>
-          <div className="calendar-grid-header">
-            <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
-          </div>
-          <div className="calendar-grid-days">
-            {/* Shift calendar grid to start on Saturday for Aug 2026 */}
-            <div className="calendar-day day-empty" />
-            <div className="calendar-day day-empty" />
-            <div className="calendar-day day-empty" />
-            <div className="calendar-day day-empty" />
-            <div className="calendar-day day-empty" />
-            {renderCalendar()}
-          </div>
-          <div className="calendar-legend">
-            <span className="legend-dot present-dot" /> Available
-            <span className="legend-dot leave-dot" /> Leave Approved
-          </div>
-        </section>
-
-        {/* Requests List Side */}
-        <section className="requests-section card">
-          <h3 className="section-title">My Leave History</h3>
-          <div className="requests-list">
-            {myLeaves.length > 0 ? (
-              myLeaves.map((l) => (
-                <div key={l.id} className="request-list-item">
-                  <div className="request-meta">
-                    <span className="request-type">{l.type} Leave</span>
-                    <span className="request-dates">{l.startDate} to {l.endDate}</span>
-                  </div>
-                  <div className="request-details">
-                    <span className="request-days-count">{l.days} day{l.days !== 1 ? 's' : ''}</span>
-                    <span className={`status-pill status-${l.status.toLowerCase()}`}>
-                      {l.status}
-                    </span>
-                  </div>
-                  {l.remarks && <p className="request-remarks">"{l.remarks}"</p>}
-                </div>
-              ))
-            ) : (
-              <div className="empty-requests">
-                <p>You haven't submitted any leave requests yet.</p>
-              </div>
-            )}
-          </div>
-        </section>
-=======
         {!isAdmin && (
-          <button className="timeoff-action-btn" onClick={() => setModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <PlusIcon size={16} />
-            <span>Request Time Off</span>
+          <button className="timeoff-action-btn" onClick={() => setModalOpen(true)}>
+            <PlusIcon size={14} style={{ marginRight: '6px' }} /> Request Time Off
           </button>
         )}
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
-      </div>
+      </section>
 
       {/* Leave Balance Cards (Employee only) */}
       {!isAdmin && (
-        <div className="balances-grid" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '20px',
-          marginBottom: '32px'
-        }}>
-          {/* Paid Leave Card */}
-          <div className="balance-card" style={{
-            background: 'var(--card-background)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '16px',
-            padding: '24px',
-            boxShadow: 'var(--shadow)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase' }}>Paid Time Off</span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '16px' }}>
-              <h2 style={{ margin: 0, fontSize: '2.5rem', color: 'var(--text-primary)', fontWeight: '700' }}>
-                {paidBalance} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: '400' }}>days left</span>
-              </h2>
+        <section className="balances-grid" style={{ marginBottom: '32px' }}>
+          <div className="balance-card card">
+            <div className="balance-info">
+              <h3>Paid Time Off</h3>
+              <p className="balance-days">{paidBalance} <span>Days left</span></p>
+              <p className="balance-total">Used: {approvedPaid} of 24 days</p>
             </div>
-            <div style={{ marginTop: '16px', backgroundColor: 'var(--background-color)', height: '6px', borderRadius: '3px', position: 'relative', border: '1px solid var(--border-color)' }}>
-              <div style={{
-                width: `${Math.min(100, (approvedPaid / 24) * 100)}%`,
-                backgroundColor: 'var(--secondary-color)',
-                height: '100%',
-                borderRadius: '3px',
-                transition: 'width 0.4s ease'
-              }}></div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-              <span>Used: {approvedPaid} days</span>
-              <span>Quota: 24 days</span>
-            </div>
+            <span className="balance-icon"><WalletIcon size={24} color="var(--primary-color)" /></span>
           </div>
 
-          {/* Sick Leave Card */}
-          <div className="balance-card" style={{
-            background: 'var(--card-background)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '16px',
-            padding: '24px',
-            boxShadow: 'var(--shadow)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase' }}>Sick Leave</span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '16px' }}>
-              <h2 style={{ margin: 0, fontSize: '2.5rem', color: 'var(--text-primary)', fontWeight: '700' }}>
-                {sickBalance} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: '400' }}>days left</span>
-              </h2>
+          <div className="balance-card card">
+            <div className="balance-info">
+              <h3>Sick Leave</h3>
+              <p className="balance-days">{sickBalance} <span>Days left</span></p>
+              <p className="balance-total">Used: {approvedSick} of 10 days</p>
             </div>
-            <div style={{ marginTop: '16px', backgroundColor: 'var(--background-color)', height: '6px', borderRadius: '3px', position: 'relative', border: '1px solid var(--border-color)' }}>
-              <div style={{
-                width: `${Math.min(100, (approvedSick / 10) * 100)}%`,
-                backgroundColor: 'var(--warning)',
-                height: '100%',
-                borderRadius: '3px',
-                transition: 'width 0.4s ease'
-              }}></div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-              <span>Used: {approvedSick} days</span>
-              <span>Quota: 10 days</span>
-            </div>
+            <span className="balance-icon"><HeartIcon size={24} color="var(--color-on-leave)" /></span>
           </div>
 
-          {/* Unpaid Leave Card */}
-          <div className="balance-card" style={{
-            background: 'var(--card-background)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '16px',
-            padding: '24px',
-            boxShadow: 'var(--shadow)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: '600', textTransform: 'uppercase' }}>Unpaid Leave</span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '16px' }}>
-              <h2 style={{ margin: 0, fontSize: '2.5rem', color: 'var(--text-primary)', fontWeight: '700' }}>
-                {approvedUnpaid} <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: '400' }}>days used</span>
-              </h2>
+          <div className="balance-card card">
+            <div className="balance-info">
+              <h3>Unpaid Leave</h3>
+              <p className="balance-days">{approvedUnpaid} <span>Days used</span></p>
+              <p className="balance-total">Always available</p>
             </div>
-            <div style={{ marginTop: '16px', backgroundColor: 'var(--background-color)', height: '6px', borderRadius: '3px', position: 'relative', border: '1px solid var(--border-color)' }}>
-              <div style={{
-                width: `${Math.min(100, (approvedUnpaid / 30) * 100)}%`,
-                backgroundColor: 'var(--danger)',
-                height: '100%',
-                borderRadius: '3px',
-                transition: 'width 0.4s ease'
-              }}></div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-              <span>Used: {approvedUnpaid} days</span>
-              <span>Unlimited</span>
-            </div>
+            <span className="balance-icon"><ResumeIcon size={24} color="var(--text-muted)" /></span>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* GRAPHICAL MONTHLY LEAVE CALENDAR */}
-      <div className="table-responsive" style={{ background: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow)', marginBottom: '32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text-primary)' }}>
+      {/* Graphical Calendar Card */}
+      <section className="calendar-section card" style={{ padding: '24px', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+          <h3 className="section-title" style={{ margin: 0 }}>
             {isAdmin ? "Leave Calendar (All Employees)" : "Your Leave Calendar"}
           </h3>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
               onClick={handlePrevMonth}
-              style={{ padding: '6px 12px', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'var(--background-color)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '6px 12px', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'var(--bg-color)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 'bold' }}
             >
               &lt;
             </button>
-            <strong style={{ minWidth: '150px', textAlign: 'center', fontSize: '1rem', color: 'var(--text-primary)' }}>
+            <strong style={{ minWidth: '130px', textAlign: 'center', fontSize: '14px', color: 'var(--text-main)' }}>
               {monthNames[calendarMonth]} {calendarYear}
             </strong>
             <button
               onClick={handleNextMonth}
-              style={{ padding: '6px 12px', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'var(--background-color)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '6px 12px', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'var(--bg-color)', color: 'var(--text-main)', cursor: 'pointer', fontWeight: 'bold' }}
             >
               &gt;
             </button>
@@ -431,15 +281,15 @@ export default function TimeOff() {
         </div>
 
         {/* Calendar Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', textAlign: 'center', minWidth: '650px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', textAlign: 'center', overflowX: 'auto' }}>
           {weekDaysShort.map((day, idx) => (
-            <div key={idx} style={{ fontWeight: 'bold', padding: '8px 0', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+            <div key={idx} style={{ fontWeight: 'bold', padding: '8px 0', borderBottom: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '13px' }}>
               {day}
             </div>
           ))}
           {calendarDays.map((day, idx) => {
             if (day === null) {
-              return <div key={idx} style={{ background: 'var(--background-color)', borderRadius: '8px', minHeight: '70px', border: '1px solid transparent' }}></div>;
+              return <div key={idx} className="calendar-day day-empty" style={{ minHeight: '80px', border: '1px solid transparent' }}></div>;
             }
 
             const cellDateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -454,23 +304,23 @@ export default function TimeOff() {
               <div key={idx} className="calendar-day" style={{
                 border: '1px solid var(--border-color)',
                 borderRadius: '8px',
-                minHeight: '70px',
-                padding: '4px',
+                minHeight: '80px',
+                padding: '6px',
                 textAlign: 'left',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                background: activeLeaves.length > 0 ? 'var(--background-color)' : 'var(--card-background)',
+                background: activeLeaves.length > 0 ? 'var(--primary-light)' : 'var(--bg-color)',
                 boxSizing: 'border-box'
               }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{day}</span>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflowY: 'auto', maxHeight: '50px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-main)' }}>{day}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflowY: 'auto', maxHeight: '55px' }}>
                   {activeLeaves.map((l, lIdx) => {
                     const emp = employees.find((e) => e.id === l.employeeId);
                     return (
                       <span key={lIdx} title={`${emp?.name || 'User'}: ${l.type} - ${l.status}\n"${l.remarks}"`} style={{
                         display: 'block',
-                        fontSize: '0.65rem',
+                        fontSize: '9px',
                         padding: '2px 4px',
                         borderRadius: '4px',
                         textOverflow: 'ellipsis',
@@ -482,9 +332,9 @@ export default function TimeOff() {
                           l.status === 'Pending' ? 'rgba(255,193,7,0.15)' :
                           'rgba(220,53,69,0.12)',
                         color:
-                          l.status === 'Approved' ? 'var(--success)' :
-                          l.status === 'Pending' ? '#d39e00' :
-                          'var(--danger)'
+                          l.status === 'Approved' ? 'var(--color-present)' :
+                          l.status === 'Pending' ? 'var(--color-absent)' :
+                          'var(--color-on-leave)'
                       }}>
                         {isAdmin ? `${emp?.name.split(' ')[0]}: ` : ""}{l.type}
                       </span>
@@ -495,124 +345,99 @@ export default function TimeOff() {
             );
           })}
         </div>
-      </div>
+      </section>
 
       {/* Requests Lists */}
-      <div style={{ width: '100%' }}>
+      <section className="requests-section card" style={{ padding: '24px' }}>
         {!isAdmin ? (
           // USER PORTAL: LEAVE REQUEST HISTORY
-          <div style={{ background: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow)' }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: '1.25rem', color: 'var(--text-primary)' }}>Your Time Off Requests</h3>
+          <div>
+            <h3 className="section-title" style={{ marginBottom: '16px' }}>Your Time Off Requests</h3>
             {myRequests.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No leave requests submitted yet.</p>
+              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '13.5px' }}>No leave requests submitted yet.</p>
             ) : (
-<<<<<<< HEAD
-              <div className="empty-approvals">
-                <span className="empty-icon"><CheckCircleIcon size={48} color="var(--primary-color)" /></span>
-                <h4>All caught up!</h4>
-                <p>There are no pending leave requests to review.</p>
-=======
-              <div className="table-responsive">
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+              <div className="table-wrapper">
+                <table className="attendance-table" style={{ width: '100%', fontSize: '13.5px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Leave Details</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Duration</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Remarks</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Attachment</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Status</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>HR Comments</th>
+                    <tr>
+                      <th>Leave Details</th>
+                      <th>Duration</th>
+                      <th>Remarks</th>
+                      <th>Attachment</th>
+                      <th>Status</th>
+                      <th>HR Comments</th>
                     </tr>
                   </thead>
                   <tbody>
                     {myRequests.map((req) => (
-                      <tr key={req.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                        <td style={{ padding: '12px 8px' }}>
-                          <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{req.type} Leave</span>
-                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>ID: #{req.id}</span>
+                      <tr key={req.id}>
+                        <td>
+                          <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{req.type} Leave</div>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: #{req.id}</span>
                         </td>
-                        <td style={{ padding: '12px 8px' }}>
+                        <td>
                           <strong>{req.days} {req.days === 1 ? 'day' : 'days'}</strong>
-                          <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          <span style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)' }}>
                             {req.startDate} to {req.endDate}
                           </span>
                         </td>
-                        <td style={{ padding: '12px 8px', color: 'var(--text-primary)', fontSize: '0.9rem' }}>{req.remarks || '--'}</td>
-                        <td style={{ padding: '12px 8px', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+                        <td style={{ color: 'var(--text-main)' }}>{req.remarks || '--'}</td>
+                        <td>
                           {req.attachment ? (
-                            <span style={{ color: 'var(--secondary-color)', fontWeight: '500' }}>📄 {req.attachment}</span>
+                            <span style={{ color: 'var(--primary-color)', fontWeight: '500' }}>📄 {req.attachment}</span>
                           ) : '--'}
                         </td>
-                        <td style={{ padding: '12px 8px' }}>
-                          <span style={{
-                            display: 'inline-block',
-                            padding: '4px 10px',
-                            borderRadius: '12px',
-                            fontSize: '0.8rem',
-                            fontWeight: '700',
-                            backgroundColor:
-                              req.status === 'Approved' ? 'rgba(40,167,69,0.1)' :
-                              req.status === 'Pending' ? 'rgba(255,193,7,0.1)' :
-                              'rgba(220,53,69,0.1)',
-                            color:
-                              req.status === 'Approved' ? 'var(--success)' :
-                              req.status === 'Pending' ? 'var(--warning)' :
-                              'var(--danger)'
-                          }}>
+                        <td>
+                          <span className={`status-pill status-${req.status.toLowerCase()}`}>
                             {req.status}
                           </span>
                         </td>
-                        <td style={{ padding: '12px 8px', color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                        <td style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
                           {req.comments || '--'}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
               </div>
             )}
           </div>
         ) : (
           // HR ADMIN VIEW: APPROVALS & FILTER PANEL
-          <div style={{ background: 'var(--card-background)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow)' }}>
-            <h3 style={{ margin: '0 0 20px', fontSize: '1.25rem', color: 'var(--text-primary)' }}>Leave Management Dashboard</h3>
+          <div>
+            <h3 className="section-title" style={{ marginBottom: '20px' }}>Leave Management Dashboard</h3>
 
             {/* Filter and Search Panel */}
             <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: '200px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>Search Employee</label>
+              <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-main)' }}>Search Employee</label>
                 <input
                   type="text"
                   placeholder="Search name or ID..."
                   value={searchEmployee}
                   onChange={(e) => setSearchEmployee(e.target.value)}
+                  className="filter-input-search"
                   style={{
-                    width: '100%',
-                    padding: '10px 14px',
+                    padding: '8px 12px',
                     border: '1px solid var(--border-color)',
-                    borderRadius: '8px',
-                    fontSize: '0.9rem',
-                    boxSizing: 'border-box',
-                    background: 'var(--card-background)',
-                    color: 'var(--text-primary)'
+                    borderRadius: '6px',
+                    background: 'var(--bg-color)',
+                    color: 'var(--text-main)'
                   }}
                 />
               </div>
-              <div style={{ width: '180px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>Status Filter</label>
+              <div style={{ width: '180px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-main)' }}>Status Filter</label>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   style={{
-                    width: '100%',
-                    padding: '10px 14px',
+                    padding: '8px 12px',
                     border: '1px solid var(--border-color)',
-                    borderRadius: '8px',
-                    fontSize: '0.9rem',
-                    boxSizing: 'border-box',
-                    background: 'var(--card-background)',
-                    color: 'var(--text-primary)'
+                    borderRadius: '6px',
+                    background: 'var(--bg-color)',
+                    color: 'var(--text-main)',
+                    height: '42px'
                   }}
                 >
                   <option value="All">All Statuses</option>
@@ -625,76 +450,62 @@ export default function TimeOff() {
 
             {/* Approval Table */}
             {adminFilteredLeaves.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No leave requests found.</p>
+              <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '13.5px' }}>No leave requests found.</p>
             ) : (
-              <div className="table-responsive">
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+              <div className="table-wrapper">
+                <table className="attendance-table" style={{ width: '100%', fontSize: '13.5px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Employee</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Leave Details</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Duration</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Remarks</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Attachment</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Status</th>
-                      <th style={{ padding: '12px 8px', color: 'var(--text-primary)', fontWeight: '600' }}>Actions</th>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Leave Details</th>
+                      <th>Duration</th>
+                      <th>Remarks</th>
+                      <th>Attachment</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {adminFilteredLeaves.map((l) => {
                       const emp = employees.find((e) => e.id === l.employeeId);
                       return (
-                        <tr key={l.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                          <td style={{ padding: '12px 8px' }}>
-                            <strong style={{ display: 'block', color: 'var(--text-primary)' }}>{emp?.name || 'Unknown'}</strong>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>ID: {l.employeeId}</span>
+                        <tr key={l.id}>
+                          <td>
+                            <strong style={{ display: 'block', color: 'var(--text-main)' }}>{emp?.name || 'Unknown'}</strong>
+                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: {l.employeeId}</span>
                           </td>
-                          <td style={{ padding: '12px 8px' }}>
-                            <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{l.type} Leave</span>
-                            <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>ID: #{l.id}</span>
+                          <td>
+                            <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{l.type} Leave</span>
+                            <span style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)' }}>ID: #{l.id}</span>
                           </td>
-                          <td style={{ padding: '12px 8px' }}>
+                          <td>
                             <strong>{l.days} {l.days === 1 ? 'day' : 'days'}</strong>
-                            <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{l.startDate} to {l.endDate}</span>
+                            <span style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)' }}>{l.startDate} to {l.endDate}</span>
                           </td>
-                          <td style={{ padding: '12px 8px', color: 'var(--text-primary)', fontSize: '0.9rem' }}>{l.remarks || '--'}</td>
-                          <td style={{ padding: '12px 8px', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+                          <td style={{ color: 'var(--text-main)' }}>{l.remarks || '--'}</td>
+                          <td>
                             {l.attachment ? (
-                              <span style={{ color: 'var(--secondary-color)', fontWeight: '500' }}>📄 {l.attachment}</span>
+                              <span style={{ color: 'var(--primary-color)', fontWeight: '500' }}>📄 {l.attachment}</span>
                             ) : '--'}
                           </td>
-                          <td style={{ padding: '12px 8px' }}>
-                            <span style={{
-                              display: 'inline-block',
-                              padding: '4px 10px',
-                              borderRadius: '12px',
-                              fontSize: '0.8rem',
-                              fontWeight: '700',
-                              backgroundColor:
-                                l.status === 'Approved' ? 'rgba(40,167,69,0.1)' :
-                                l.status === 'Pending' ? 'rgba(255,193,7,0.1)' :
-                                'rgba(220,53,69,0.1)',
-                              color:
-                                l.status === 'Approved' ? 'var(--success)' :
-                                l.status === 'Pending' ? 'var(--warning)' :
-                                'var(--danger)'
-                            }}>
+                          <td>
+                            <span className={`status-pill status-${l.status.toLowerCase()}`}>
                               {l.status}
                             </span>
                           </td>
-                          <td style={{ padding: '12px 8px' }}>
+                          <td>
                             {l.status === 'Pending' ? (
                               <div style={{ display: 'flex', gap: '8px' }}>
                                 <button
                                   onClick={() => handleReviewTrigger(l.id, 'Approved')}
                                   style={{
-                                    backgroundColor: 'var(--success)',
+                                    backgroundColor: 'var(--color-present)',
                                     color: 'white',
                                     border: 'none',
                                     padding: '6px 12px',
                                     borderRadius: '6px',
                                     cursor: 'pointer',
-                                    fontSize: '0.85rem',
+                                    fontSize: '12px',
                                     fontWeight: '600'
                                   }}
                                 >
@@ -703,13 +514,13 @@ export default function TimeOff() {
                                 <button
                                   onClick={() => handleReviewTrigger(l.id, 'Rejected')}
                                   style={{
-                                    backgroundColor: 'var(--danger)',
+                                    backgroundColor: 'var(--color-on-leave)',
                                     color: 'white',
                                     border: 'none',
                                     padding: '6px 12px',
                                     borderRadius: '6px',
                                     cursor: 'pointer',
-                                    fontSize: '0.85rem',
+                                    fontSize: '12px',
                                     fontWeight: '600'
                                   }}
                                 >
@@ -717,7 +528,7 @@ export default function TimeOff() {
                                 </button>
                               </div>
                             ) : (
-                              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
                                 Comments: {l.comments || 'None'}
                               </span>
                             )}
@@ -731,53 +542,20 @@ export default function TimeOff() {
             )}
           </div>
         )}
-      </div>
+      </section>
 
       {/* --- FORM MODAL: REQUEST TIME OFF --- */}
       {modalOpen && (
-<<<<<<< HEAD
         <div className="modal-backdrop">
-          <div className="modal-content card glassmorphism">
-            <div className="modal-header">
+          <div className="modal-content card glassmorphism" style={{ maxWidth: '500px', width: '90%', padding: '24px' }}>
+            <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>Request Time Off</h2>
               <button className="close-modal-btn" onClick={() => setModalOpen(false)}><CloseIcon size={18} /></button>
-=======
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 2000
-        }}>
-          <div style={{
-            background: 'var(--card-background)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '16px',
-            padding: '30px',
-            maxWidth: '500px',
-            width: '90%',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-            boxSizing: 'border-box'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0, fontSize: '1.4rem', color: 'var(--text-primary)' }}>Request Time Off</h3>
-              <button
-                onClick={() => setModalOpen(false)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <XIcon size={20} />
-              </button>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             </div>
             
             <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>Leave Type</label>
+              <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Leave Type</label>
                 <select
                   value={leaveType}
                   onChange={(e) => setLeaveType(e.target.value)}
@@ -786,9 +564,10 @@ export default function TimeOff() {
                     padding: '10px',
                     border: '1px solid var(--border-color)',
                     borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    background: 'var(--card-background)',
-                    color: 'var(--text-primary)'
+                    fontSize: '14px',
+                    background: 'var(--bg-color)',
+                    color: 'var(--text-main)',
+                    height: '42px'
                   }}
                 >
                   <option value="Paid">Paid Leave</option>
@@ -798,8 +577,8 @@ export default function TimeOff() {
               </div>
 
               <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: '180px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>Start Date *</label>
+                <div style={{ flex: 1, minWidth: '180px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Start Date *</label>
                   <input 
                     type="date" 
                     value={startDate} 
@@ -810,15 +589,16 @@ export default function TimeOff() {
                       padding: '10px',
                       border: '1px solid var(--border-color)',
                       borderRadius: '8px',
-                      fontSize: '0.95rem',
-                      background: 'var(--card-background)',
-                      color: 'var(--text-primary)',
-                      boxSizing: 'border-box'
+                      fontSize: '14px',
+                      background: 'var(--bg-color)',
+                      color: 'var(--text-main)',
+                      boxSizing: 'border-box',
+                      height: '42px'
                     }}
                   />
                 </div>
-                <div style={{ flex: 1, minWidth: '180px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>End Date *</label>
+                <div style={{ flex: 1, minWidth: '180px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>End Date *</label>
                   <input 
                     type="date" 
                     value={endDate} 
@@ -829,17 +609,18 @@ export default function TimeOff() {
                       padding: '10px',
                       border: '1px solid var(--border-color)',
                       borderRadius: '8px',
-                      fontSize: '0.95rem',
-                      background: 'var(--card-background)',
-                      color: 'var(--text-primary)',
-                      boxSizing: 'border-box'
+                      fontSize: '14px',
+                      background: 'var(--bg-color)',
+                      color: 'var(--text-main)',
+                      boxSizing: 'border-box',
+                      height: '42px'
                     }}
                   />
                 </div>
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>Remarks / Reason</label>
+              <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Remarks / Reason</label>
                 <textarea
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
@@ -849,19 +630,19 @@ export default function TimeOff() {
                     padding: '10px',
                     border: '1px solid var(--border-color)',
                     borderRadius: '8px',
-                    fontSize: '0.95rem',
-                    minHeight: '60px',
+                    fontSize: '14px',
+                    minHeight: '80px',
                     fontFamily: 'inherit',
                     boxSizing: 'border-box',
-                    background: 'var(--card-background)',
-                    color: 'var(--text-primary)'
+                    background: 'var(--bg-color)',
+                    color: 'var(--text-main)'
                   }}
                 ></textarea>
               </div>
 
               {/* ATTACHMENT/FILE INPUT */}
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>Attachment (Medical certificate/document)</label>
+              <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Attachment (Medical certificate/document)</label>
                 <input
                   type="file"
                   onChange={(e) => {
@@ -875,14 +656,14 @@ export default function TimeOff() {
                     padding: '8px',
                     border: '1px solid var(--border-color)',
                     borderRadius: '8px',
-                    fontSize: '0.9rem',
+                    fontSize: '14px',
                     boxSizing: 'border-box',
-                    background: 'var(--card-background)',
-                    color: 'var(--text-primary)'
+                    background: 'var(--bg-color)',
+                    color: 'var(--text-main)'
                   }}
                 />
                 {attachment && (
-                  <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--success)', marginTop: '6px', fontWeight: '600' }}>
+                  <span style={{ display: 'block', fontSize: '12px', color: 'var(--color-present)', marginTop: '6px', fontWeight: '600' }}>
                     Selected: {attachment}
                   </span>
                 )}
@@ -895,31 +676,15 @@ export default function TimeOff() {
                     setAttachment('');
                     setModalOpen(false);
                   }}
-                  style={{
-                    backgroundColor: 'var(--background-color)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '8px',
-                    padding: '10px 20px',
-                    fontSize: '0.95rem',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
+                  className="profile-btn btn-cancel"
+                  style={{ minWidth: '100px' }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  style={{
-                    backgroundColor: 'var(--primary-color)',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '10px 20px',
-                    fontSize: '0.95rem',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
+                  className="profile-btn btn-save"
+                  style={{ minWidth: '120px' }}
                 >
                   Submit Request
                 </button>
@@ -931,37 +696,17 @@ export default function TimeOff() {
 
       {/* --- REVIEW MODAL: APPROVE/REJECT WITH COMMENTS --- */}
       {reviewModalOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 2001
-        }}>
-          <div style={{
-            background: 'var(--card-background)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '16px',
-            padding: '30px',
-            maxWidth: '450px',
-            width: '90%',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-            boxSizing: 'border-box'
-          }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: '1.25rem', color: 'var(--text-primary)' }}>
+        <div className="modal-backdrop">
+          <div className="modal-content card glassmorphism" style={{ maxWidth: '450px', width: '90%', padding: '24px' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: '18px', color: 'var(--text-main)' }}>
               Provide Review Comments
             </h3>
-            <p style={{ margin: '0 0 16px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+            <p style={{ margin: '0 0 16px', fontSize: '13.5px', color: 'var(--text-muted)' }}>
               Are you sure you want to <strong>{reviewStatus.toLowerCase()}</strong> this leave request? Please provide any feedback or reason for this decision below.
             </p>
             <form onSubmit={handleReviewSubmit}>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '6px' }}>Reviewer Comments</label>
+              <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>Reviewer Comments</label>
                 <textarea
                   value={reviewComments}
                   onChange={(e) => setReviewComments(e.target.value)}
@@ -971,12 +716,12 @@ export default function TimeOff() {
                     padding: '10px',
                     border: '1px solid var(--border-color)',
                     borderRadius: '8px',
-                    fontSize: '0.95rem',
+                    fontSize: '14px',
                     minHeight: '80px',
                     fontFamily: 'inherit',
                     boxSizing: 'border-box',
-                    background: 'var(--card-background)',
-                    color: 'var(--text-primary)'
+                    background: 'var(--bg-color)',
+                    color: 'var(--text-main)'
                   }}
                 ></textarea>
               </div>
@@ -989,28 +734,20 @@ export default function TimeOff() {
                     setReviewComments('');
                     setReviewModalOpen(false);
                   }}
-                  style={{
-                    backgroundColor: 'var(--background-color)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '8px',
-                    padding: '10px 20px',
-                    fontSize: '0.95rem',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
+                  className="profile-btn btn-cancel"
+                  style={{ minWidth: '100px' }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   style={{
-                    backgroundColor: reviewStatus === 'Approved' ? 'var(--success)' : 'var(--danger)',
+                    backgroundColor: reviewStatus === 'Approved' ? 'var(--color-present)' : 'var(--color-on-leave)',
                     color: '#ffffff',
                     border: 'none',
-                    borderRadius: '8px',
+                    borderRadius: '6px',
                     padding: '10px 20px',
-                    fontSize: '0.95rem',
+                    fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer'
                   }}

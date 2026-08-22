@@ -4,11 +4,7 @@ import TabResume from '../components/TabResume';
 import TabPrivateInfo from '../components/TabPrivateInfo';
 import TabSalaryInfo from '../components/TabSalaryInfo';
 import TabSecurity from '../components/TabSecurity';
-<<<<<<< HEAD
 import { PencilIcon, SaveIcon, CloseIcon, LogoutIcon, BackIcon, CameraIcon } from '../components/Icons';
-=======
-import { EditIcon, CheckIcon, XIcon, ChevronDownIcon, UploadIcon } from '../components/Icons';
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
 import '../styles/profile.css';
 
 export default function Profile() {
@@ -100,61 +96,43 @@ export default function Profile() {
         finalData.name = employee.name;
         finalData.email = employee.email;
         finalData.role = employee.role;
-        finalData.id = employee.id;
-        
-        if (employee.privateInfo) {
-          finalData.privateInfo = {
-            ...formData.privateInfo,
-            dob: employee.privateInfo.dob,
-            gender: employee.privateInfo.gender,
-            maritalStatus: employee.privateInfo.maritalStatus,
-            nationality: employee.privateInfo.nationality,
-            personalEmail: employee.privateInfo.personalEmail,
-            bankName: employee.privateInfo.bankName,
-            ifsc: employee.privateInfo.ifsc,
-            accountNo: employee.privateInfo.accountNo
-          };
-        }
-        
-        if (employee.salaryInfo) {
-          finalData.salaryInfo = { ...employee.salaryInfo };
-        }
+        finalData.privateInfo.dob = employee.privateInfo?.dob || '';
+        finalData.privateInfo.gender = employee.privateInfo?.gender || '';
+        finalData.privateInfo.maritalStatus = employee.privateInfo?.maritalStatus || '';
+        finalData.privateInfo.nationality = employee.privateInfo?.nationality || '';
+        finalData.privateInfo.personalEmail = employee.privateInfo?.personalEmail || '';
+        finalData.privateInfo.bankName = employee.privateInfo?.bankName || '';
+        finalData.privateInfo.ifsc = employee.privateInfo?.ifsc || '';
+        finalData.privateInfo.accountNo = employee.privateInfo?.accountNo || '';
+        finalData.salaryInfo = employee.salaryInfo;
+      }
+
+      if (!isAdmin && !isOwnProfile) {
+        // Double check standard employee cannot change other profile details at all
+        finalData.phone = employee.phone;
+        finalData.privateInfo.address = employee.privateInfo?.address || '';
+        finalData.avatar = employee.avatar;
       }
 
       updateProfile(employee.id, finalData);
-      setIsEditing(false);
       showNotification('Profile updated successfully!', 'success');
+      setIsEditing(false);
     } catch (err) {
-      showNotification(err.message, 'error');
+      showNotification(err.message || 'Failed to update profile.', 'error');
     }
   };
 
   const handleCancel = () => {
+    // Reset to the original employee data
+    setFormData(JSON.parse(JSON.stringify(employee)));
     setIsEditing(false);
-    setFormData(JSON.parse(JSON.stringify(employee))); // revert
-  };
-
-  const getInitials = () => {
-    if (!employee.name) return 'ME';
-    const cleanName = employee.name.replace(/[^a-zA-Z ]/g, '').trim();
-    const parts = cleanName.split(/\s+/).filter(Boolean);
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-    return 'ME';
-  };
-
-  const handleAvatarClick = () => {
-    if (canEdit && fileInputRef.current) {
-      fileInputRef.current.click();
-    }
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file size (limit to 2MB to prevent localStorage overflow)
-      if (file.size > 2 * 1024 * 1024) {
-        showNotification("Image must be smaller than 2MB.", "error");
+      if (file.size > 1024 * 1024) {
+        showNotification('File size too large. Max 1MB allowed.', 'error');
         return;
       }
       const reader = new FileReader();
@@ -165,6 +143,13 @@ export default function Profile() {
     }
   };
 
+  const handleAvatarClick = () => {
+    if (canEdit && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Render sub-components based on active tab
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'resume':
@@ -180,7 +165,6 @@ export default function Profile() {
           <TabPrivateInfo 
             employee={formData} 
             isEditing={canEdit} 
-            // regular employee is restricted to allowed personal fields
             isRestricted={!isAdmin}
             onChange={(field, val) => handleFieldChange('privateInfo', field, val)}
             onBaseFieldChange={(field, val) => handleFieldChange(null, field, val)}
@@ -199,8 +183,8 @@ export default function Profile() {
         return (
           <TabSecurity 
             employee={formData} 
-            isEditing={isOwnProfile} // Security credentials only manageable by the profile owner
-            onChange={(field, val) => handleFieldChange(null, field, val)} 
+            isEditing={isOwnProfile} 
+            onChange={(field, val) => handleFieldChange(null, field, val)}
           />
         );
       default:
@@ -210,46 +194,26 @@ export default function Profile() {
 
   return (
     <div className="profile-page-container">
-      {/* Profile Header Details */}
+      {/* Profile Hero Card */}
       <section className="profile-hero-card card glassmorphism">
-        <div className="profile-header-main">
+        <div className="profile-hero-main">
+          {/* Avatar wrapper */}
           <div 
-            className={`profile-avatar-wrapper ${canEdit ? 'editable' : ''}`} 
+            className={`profile-avatar-wrapper ${canEdit ? 'editable' : ''}`}
             onClick={handleAvatarClick}
-            style={{ cursor: canEdit ? 'pointer' : 'default' }}
           >
             {formData.avatar ? (
-              <img src={formData.avatar} alt={formData.name} className="profile-hero-avatar" />
+              <img src={formData.avatar} alt="Profile" className="profile-avatar-img" />
             ) : (
-              <div className="profile-hero-placeholder">{getInitials()}</div>
+              <div className="profile-avatar-placeholder">
+                {(formData.name || 'EM').substring(0, 2).toUpperCase()}
+              </div>
             )}
             
             {canEdit && (
-<<<<<<< HEAD
               <div className="avatar-upload-overlay">
                 <span><CameraIcon size={14} style={{ marginRight: '4px' }} /> Upload</span>
               </div>
-=======
-              <label className="avatar-upload-label" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <UploadIcon size={12} />
-                <span>Upload</span>
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  style={{ display: 'none' }}
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        handleFieldChange(null, 'avatar', reader.result);
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                />
-              </label>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             )}
             <input 
               type="file" 
@@ -275,29 +239,15 @@ export default function Profile() {
               className="profile-btn btn-edit" 
               onClick={() => setIsEditing(true)}
             >
-<<<<<<< HEAD
               <PencilIcon size={14} style={{ marginRight: '6px' }} /> Edit Profile
-=======
-              <EditIcon size={14} />
-              <span>Edit Profile</span>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             </button>
           ) : canUserEditProfile && isEditing ? (
             <div className="action-button-group">
               <button className="profile-btn btn-save" onClick={handleSave}>
-<<<<<<< HEAD
                 <SaveIcon size={14} style={{ marginRight: '6px' }} /> Save
               </button>
               <button className="profile-btn btn-cancel" onClick={handleCancel}>
                 <CloseIcon size={14} style={{ marginRight: '6px' }} /> Cancel
-=======
-                <CheckIcon size={14} />
-                <span>Save</span>
-              </button>
-              <button className="profile-btn btn-cancel" onClick={handleCancel}>
-                <XIcon size={14} />
-                <span>Cancel</span>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
               </button>
             </div>
           ) : null}
@@ -307,7 +257,6 @@ export default function Profile() {
               className="profile-btn btn-back"
               onClick={() => setCurrentTab('dashboard')}
             >
-<<<<<<< HEAD
               <BackIcon size={14} style={{ marginRight: '6px' }} /> Back to List
             </button>
           )}
@@ -315,10 +264,6 @@ export default function Profile() {
           {isOwnProfile && (
             <button className="profile-btn btn-logout" onClick={logout}>
               <LogoutIcon size={14} style={{ marginRight: '6px' }} /> Sign Out
-=======
-              <ChevronDownIcon size={14} style={{ transform: 'rotate(90deg)' }} />
-              <span>Back to List</span>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             </button>
           )}
         </div>

@@ -1,10 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-<<<<<<< HEAD
-import { UserIcon, UsersIcon } from '../components/Icons';
-=======
-import { LockIcon, UsersIcon } from '../components/Icons';
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
+import { UserIcon, UsersIcon, LockIcon } from '../components/Icons';
 import '../styles/login.css';
 
 export default function Login() {
@@ -207,12 +203,7 @@ export default function Login() {
                   onClick={() => handleDemoLogin('sidharth@odoo.com')}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-<<<<<<< HEAD
                   <UserIcon size={14} style={{ marginRight: '6px' }} /> Login as HR Admin
-=======
-                  <LockIcon size={14} />
-                  <span>Login as HR Admin</span>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
                 </button>
                 <button 
                   type="button" 
@@ -220,12 +211,7 @@ export default function Login() {
                   onClick={() => handleDemoLogin('rujitha@odoo.com')}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-<<<<<<< HEAD
                   <UsersIcon size={14} style={{ marginRight: '6px' }} /> Login as Employee
-=======
-                  <UsersIcon size={14} />
-                  <span>Login as Employee</span>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
                 </button>
               </div>
             </div>

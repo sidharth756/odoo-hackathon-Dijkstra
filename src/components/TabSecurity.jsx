@@ -1,10 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-<<<<<<< HEAD
 import { LockIcon, WarningIcon } from './Icons';
-=======
-import { LockIcon } from './Icons';
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
 
 export default function TabSecurity({ employee, isEditing, onChange }) {
   const { showNotification } = useContext(AppContext);
@@ -15,14 +11,8 @@ export default function TabSecurity({ employee, isEditing, onChange }) {
   if (!isEditing) {
     return (
       <div className="tab-security-container">
-<<<<<<< HEAD
         <p className="security-notice">
           <WarningIcon size={14} style={{ marginRight: '6px' }} /> Security details can only be edited by the profile owner. Regular view is restricted.
-=======
-        <p className="security-notice" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <LockIcon size={16} />
-          <span>Security details can only be edited by the profile owner. Regular view is restricted.</span>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
         </p>
       </div>
     );
@@ -100,14 +90,8 @@ export default function TabSecurity({ employee, isEditing, onChange }) {
           />
         </div>
 
-<<<<<<< HEAD
         <button type="submit" className="profile-btn btn-save" style={{ marginTop: '16px', width: 'fit-content' }}>
           <LockIcon size={14} style={{ marginRight: '6px' }} /> Update Password
-=======
-        <button type="submit" className="profile-btn btn-save" style={{ marginTop: '16px', width: 'fit-content', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <LockIcon size={14} />
-          <span>Update Password</span>
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
         </button>
       </form>
     </div>

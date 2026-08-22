@@ -2,11 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import EmployeeCard from '../components/EmployeeCard';
 import CheckInWidget from '../components/CheckInWidget';
-<<<<<<< HEAD
-import { UserPlusIcon, SearchIcon, UsersIcon, CloseIcon } from '../components/Icons';
-=======
-import { SearchIcon, FileTextIcon } from '../components/Icons';
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
+import { UserPlusIcon, SearchIcon, UsersIcon, CloseIcon, FileTextIcon } from '../components/Icons';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -128,11 +124,7 @@ export default function Dashboard() {
           
           {/* Search bar */}
           <div className="search-bar-container">
-<<<<<<< HEAD
-            <span className="search-icon"><SearchIcon size={16} /></span>
-=======
             <SearchIcon className="search-input-icon" size={16} />
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             <input
               type="text"
               className="search-input"
@@ -152,11 +144,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="no-results">
-<<<<<<< HEAD
             <div className="no-results-icon"><UsersIcon size={48} color="var(--text-muted)" /></div>
-=======
-            <FileTextIcon size={48} className="no-results-svg-icon" style={{ opacity: 0.5, color: 'var(--text-muted)' }} />
->>>>>>> 5722d753479e178a5c40145c0e43abfbe62c46c2
             <h3>No employees found</h3>
             <p>We couldn't find any results matching "{searchQuery}". Please check the spelling or try a different query.</p>
           </div>
