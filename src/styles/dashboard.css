@@ -296,43 +296,43 @@
   }
 }
 
-/* Check-In/Check-Out Widget Styles */
+/* Check-In/Check-Out Widget Styles (Default Light) */
 .checkin-widget {
   width: 300px;
-  background: rgba(255, 255, 255, 0.15) !important; /* Semi-transparent white */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff;
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 .checkin-widget:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .widget-clock-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 12px;
 }
 
 .clock-icon {
   font-size: 20px;
   margin-bottom: 4px;
+  color: var(--primary-color);
   opacity: 0.9;
 }
 
 .clock-time {
   font-size: 30px;
   font-weight: 800;
+  color: var(--text-main);
   letter-spacing: -0.5px;
   font-variant-numeric: tabular-nums;
 }
@@ -340,7 +340,7 @@
 .clock-date {
   font-size: 13px;
   font-weight: 600;
-  opacity: 0.85;
+  color: var(--text-muted);
 }
 
 .widget-status-section {
@@ -358,6 +358,7 @@
 
 .status-text {
   font-weight: 500;
+  color: var(--text-main);
 }
 
 .status-indicator-pulse {
@@ -365,22 +366,22 @@
   height: 10px;
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-  animation: pulse-glow 2s infinite;
+  box-shadow: 0 0 0 0 rgba(113, 75, 103, 0.4);
+  animation: pulse-glow-dark 2s infinite;
 }
 
 .status-times {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  background: rgba(0, 0, 0, 0.15);
+  background-color: var(--bg-color);
   padding: 6px 10px;
   border-radius: var(--border-radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .status-times p {
-  opacity: 0.9;
+  color: var(--text-muted);
 }
 
 .widget-btn {
@@ -411,8 +412,73 @@
   background-color: #dc2626;
 }
 
-/* Pulsing Glow Animation */
-@keyframes pulse-glow {
+/* Pulsing Glow Animation (Default Light) */
+@keyframes pulse-glow-dark {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(113, 75, 103, 0.5);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(113, 75, 103, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(113, 75, 103, 0);
+  }
+}
+
+/* Dashboard Gradient Hero Panel Override (Glassmorphism Dark) */
+.dashboard-hero-section .checkin-widget {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
+}
+
+.dashboard-hero-section .checkin-widget:hover {
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+.dashboard-hero-section .checkin-widget .widget-clock-section {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-hero-section .checkin-widget .clock-icon {
+  color: #ffffff;
+}
+
+.dashboard-hero-section .checkin-widget .clock-time {
+  color: #ffffff;
+}
+
+.dashboard-hero-section .checkin-widget .clock-date {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.dashboard-hero-section .checkin-widget .status-text {
+  color: #ffffff;
+}
+
+.dashboard-hero-section .checkin-widget .status-indicator-pulse {
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  animation: pulse-glow-light 2s infinite;
+}
+
+.dashboard-hero-section .checkin-widget .status-times {
+  background: rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-hero-section .checkin-widget .status-times p {
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+/* Pulsing Glow Animation (Glow on Dark Hero) */
+@keyframes pulse-glow-light {
   0% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
@@ -426,4 +492,3 @@
     box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
   }
 }
-

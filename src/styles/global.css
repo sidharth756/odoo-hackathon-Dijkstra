@@ -498,20 +498,3 @@ input:focus, select:focus, textarea:focus {
     justify-content: center;
   }
 }
-
-/* System Dark Mode Override Support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-main: #e0e0e0;
-    --text-muted: #aaaaaa;
-    --border-color: #333333;
-    --primary-light: #3d2b38;
-  }
-
-  body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-  }
-}
