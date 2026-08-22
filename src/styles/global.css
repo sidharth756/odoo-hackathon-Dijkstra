@@ -1,0 +1,13 @@
+/* Global CSS Variable Definitions and Resets */
+:root {
+  --primary-color: #714B67; /* Odoo Purple */
+  --secondary-color: #01A09D; /* Odoo Teal */
+  --background-color: #f8f9fa;
+  --card-background: #ffffff;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
+}
