@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
+import { ClockIcon } from './Icons';
 
 export default function CheckInWidget() {
   const { currentUser, attendance, checkIn, checkOut, showNotification } = useContext(AppContext);
@@ -36,7 +37,7 @@ export default function CheckInWidget() {
   return (
     <div className="checkin-widget card glassmorphism">
       <div className="widget-clock-section">
-        <span className="clock-icon">🕒</span>
+        <ClockIcon size={24} className="clock-svg-icon" style={{ opacity: 0.9, marginBottom: '6px' }} />
         <div className="clock-time">{formatTime(time)}</div>
         <div className="clock-date">
           {time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}

@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
+import { PalmIcon, HeartPulseIcon, FileTextIcon, CheckIcon, XIcon, PlusIcon } from '../components/Icons';
 import '../styles/timeoff.css';
 
 export default function TimeOff() {
@@ -149,14 +150,15 @@ export default function TimeOff() {
       {/* Page Header */}
       <section className="timeoff-header-card card glassmorphism">
         <div className="timeoff-title-area">
-          <span className="page-icon">🏖️</span>
+          <PalmIcon size={32} className="page-svg-icon" style={{ color: 'var(--primary-color)' }} />
           <div>
             <h1>Time Off & Leaves</h1>
             <p className="subtitle">Submit leave requests, check your remaining balances, and track approvals.</p>
           </div>
         </div>
-        <button className="timeoff-action-btn" onClick={() => setModalOpen(true)}>
-          ➕ Request Time Off
+        <button className="timeoff-action-btn" onClick={() => setModalOpen(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <PlusIcon size={16} />
+          <span>Request Time Off</span>
         </button>
       </section>
 
@@ -168,7 +170,7 @@ export default function TimeOff() {
             <p className="balance-days">{paidBalance} <span>Days left</span></p>
             <p className="balance-total">Used: {approvedPaid} of 24 days</p>
           </div>
-          <span className="balance-icon">🌴</span>
+          <PalmIcon size={36} className="balance-svg-icon" style={{ color: 'var(--primary-color)' }} />
         </div>
 
         <div className="balance-card card">
@@ -177,7 +179,7 @@ export default function TimeOff() {
             <p className="balance-days">{sickBalance} <span>Days left</span></p>
             <p className="balance-total">Used: {approvedSick} of 10 days</p>
           </div>
-          <span className="balance-icon">🤒</span>
+          <HeartPulseIcon size={36} className="balance-svg-icon" style={{ color: 'var(--color-on-leave)' }} />
         </div>
 
         <div className="balance-card card">
@@ -186,7 +188,7 @@ export default function TimeOff() {
             <p className="balance-days">-- <span>Days used</span></p>
             <p className="balance-total">Always available</p>
           </div>
-          <span className="balance-icon">📁</span>
+          <FileTextIcon size={36} className="balance-svg-icon" style={{ color: 'var(--color-pending)' }} />
         </div>
       </section>
 
@@ -281,7 +283,7 @@ export default function TimeOff() {
               </table>
             ) : (
               <div className="empty-approvals">
-                <span className="empty-icon">🎉</span>
+                <CheckIcon size={48} className="empty-svg-icon" style={{ color: 'var(--color-present)', margin: '0 auto 12px', opacity: 0.8 }} />
                 <h4>All caught up!</h4>
                 <p>There are no pending leave requests to review.</p>
               </div>
@@ -296,7 +298,9 @@ export default function TimeOff() {
           <div className="modal-content card glassmorphism">
             <div className="modal-header">
               <h2>Request Time Off</h2>
-              <button className="close-modal-btn" onClick={() => setModalOpen(false)}>×</button>
+              <button className="close-modal-btn" onClick={() => setModalOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <XIcon size={20} />
+              </button>
             </div>
             
             <form onSubmit={handleSubmit} className="leave-form">

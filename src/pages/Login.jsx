@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
+import { LockIcon, UsersIcon } from '../components/Icons';
 import '../styles/login.css';
 
 export default function Login() {
@@ -196,15 +197,19 @@ export default function Login() {
                   type="button" 
                   className="demo-btn demo-admin"
                   onClick={() => handleDemoLogin('sidharth@odoo.com')}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-                  👑 Login as HR Admin
+                  <LockIcon size={14} />
+                  <span>Login as HR Admin</span>
                 </button>
                 <button 
                   type="button" 
                   className="demo-btn demo-employee"
                   onClick={() => handleDemoLogin('rujitha@odoo.com')}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-                  👤 Login as Employee
+                  <UsersIcon size={14} />
+                  <span>Login as Employee</span>
                 </button>
               </div>
             </div>

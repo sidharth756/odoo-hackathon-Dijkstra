@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
+import { CalendarIcon, FileTextIcon } from '../components/Icons';
 import '../styles/attendance.css';
 
 export default function Attendance() {
@@ -54,7 +55,7 @@ export default function Attendance() {
       {/* Page Header and Title */}
       <section className="attendance-header-card card glassmorphism">
         <div className="attendance-title-area">
-          <span className="page-icon">📅</span>
+          <CalendarIcon size={32} className="page-svg-icon" style={{ color: 'var(--primary-color)' }} />
           <div>
             <h1>Attendance Tracking</h1>
             <p className="subtitle">
@@ -152,7 +153,7 @@ export default function Attendance() {
             </table>
           ) : (
             <div className="empty-table-state">
-              <div className="empty-icon">📭</div>
+              <FileTextIcon size={48} className="empty-svg-icon" style={{ opacity: 0.5, color: 'var(--text-muted)' }} />
               <h3>No attendance records found</h3>
               <p>There are no recorded check-ins for {filterDate} matching your filters.</p>
             </div>

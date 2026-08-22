@@ -228,6 +228,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 8px 16px;
   border-radius: var(--border-radius-sm);
   font-weight: 600;
@@ -356,6 +359,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
   text-align: left;
   padding: 8px 12px;

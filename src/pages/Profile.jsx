@@ -4,6 +4,7 @@ import TabResume from '../components/TabResume';
 import TabPrivateInfo from '../components/TabPrivateInfo';
 import TabSalaryInfo from '../components/TabSalaryInfo';
 import TabSecurity from '../components/TabSecurity';
+import { EditIcon, CheckIcon, XIcon, ChevronDownIcon, UploadIcon } from '../components/Icons';
 import '../styles/profile.css';
 
 export default function Profile() {
@@ -133,8 +134,9 @@ export default function Profile() {
             )}
             
             {canEdit && (
-              <label className="avatar-upload-label">
-                📷 Upload
+              <label className="avatar-upload-label" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <UploadIcon size={12} />
+                <span>Upload</span>
                 <input 
                   type="file" 
                   accept="image/*" 
@@ -170,15 +172,18 @@ export default function Profile() {
               className="profile-btn btn-edit" 
               onClick={() => setIsEditing(true)}
             >
-              📝 Edit Profile
+              <EditIcon size={14} />
+              <span>Edit Profile</span>
             </button>
           ) : (
             <div className="action-button-group">
               <button className="profile-btn btn-save" onClick={handleSave}>
-                💾 Save
+                <CheckIcon size={14} />
+                <span>Save</span>
               </button>
               <button className="profile-btn btn-cancel" onClick={handleCancel}>
-                ❌ Cancel
+                <XIcon size={14} />
+                <span>Cancel</span>
               </button>
             </div>
           )}
@@ -188,7 +193,8 @@ export default function Profile() {
               className="profile-btn btn-back"
               onClick={() => setCurrentTab('dashboard')}
             >
-              ⬅️ Back to List
+              <ChevronDownIcon size={14} style={{ transform: 'rotate(90deg)' }} />
+              <span>Back to List</span>
             </button>
           )}
         </div>

@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import EmployeeCard from '../components/EmployeeCard';
 import CheckInWidget from '../components/CheckInWidget';
+import { SearchIcon, FileTextIcon } from '../components/Icons';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -49,7 +50,7 @@ export default function Dashboard() {
           
           {/* Search bar */}
           <div className="search-bar-container">
-            <span className="search-icon">🔍</span>
+            <SearchIcon className="search-input-icon" size={16} />
             <input
               type="text"
               className="search-input"
@@ -69,7 +70,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="no-results">
-            <div className="no-results-icon">📂</div>
+            <FileTextIcon size={48} className="no-results-svg-icon" style={{ opacity: 0.5, color: 'var(--text-muted)' }} />
             <h3>No employees found</h3>
             <p>We couldn't find any results matching "{searchQuery}". Please check the spelling or try a different query.</p>
           </div>

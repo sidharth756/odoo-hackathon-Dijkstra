@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
+import { LockIcon } from './Icons';
 
 export default function TabSecurity({ employee, isEditing, onChange }) {
   const { showNotification } = useContext(AppContext);
@@ -10,8 +11,9 @@ export default function TabSecurity({ employee, isEditing, onChange }) {
   if (!isEditing) {
     return (
       <div className="tab-security-container">
-        <p className="security-notice">
-          ℹ️ Security details can only be edited by the profile owner. Regular view is restricted.
+        <p className="security-notice" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <LockIcon size={16} />
+          <span>Security details can only be edited by the profile owner. Regular view is restricted.</span>
         </p>
       </div>
     );
@@ -89,8 +91,9 @@ export default function TabSecurity({ employee, isEditing, onChange }) {
           />
         </div>
 
-        <button type="submit" className="profile-btn btn-save" style={{ marginTop: '16px', width: 'fit-content' }}>
-          🔒 Update Password
+        <button type="submit" className="profile-btn btn-save" style={{ marginTop: '16px', width: 'fit-content', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <LockIcon size={14} />
+          <span>Update Password</span>
         </button>
       </form>
     </div>
