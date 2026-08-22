@@ -1,1 +1,1 @@
-# Team Dijikstra (Human Resource Management System)
+# Team Dijkstra (Human Resource Management System)
